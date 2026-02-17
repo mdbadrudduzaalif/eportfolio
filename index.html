@@ -1,327 +1,290 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>MD Badrudduza Alif | Portfolio CV</title>
+<title>MD Badrudduza Alif | Portfolio</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* Theme */
 
 :root {
   --ink: #10151f;
   --muted: #5a6678;
   --accent: #ff7a3d;
-  --accent-2: #2bb3a4;
   --paper: #f6f3ef;
   --panel: #ffffff;
-  --shadow: 0 18px 40px rgba(16, 21, 31, 0.12);
+  --shadow: 0 18px 40px rgba(16,21,31,0.12);
 }
 
-* { box-sizing: border-box; }
+.dark {
+  --ink: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --paper: #0f172a;
+  --panel: #1e293b;
+  --shadow: 0 18px 40px rgba(0,0,0,0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
 
 body {
   margin: 0;
   font-family: "Space Grotesk", sans-serif;
+  background: var(--paper);
   color: var(--ink);
-  background:
-    radial-gradient(1200px 900px at 10% 0%, rgba(43,179,164,0.18), transparent 60%),
-    radial-gradient(900px 700px at 90% 10%, rgba(255,122,61,0.18), transparent 55%),
-    var(--paper);
+  transition: 0.4s;
 }
 
 .page {
   max-width: 1100px;
   margin: auto;
-  padding: 48px 24px 80px;
+  padding: 40px 20px;
 }
+
+/* Logo nav */
+
+nav {
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+nav a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.logo {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* Theme toggle */
+
+.toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--panel);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+/* Header */
 
 header {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 32px;
+  grid-template-columns: 160px auto;
+  gap: 30px;
   align-items: center;
 }
 
-.badge {
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(16,21,31,0.08);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+.profile-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.profile-photo:hover {
+  transform: scale(1.05);
 }
 
 h1 {
   font-family: "Playfair Display", serif;
-  font-size: clamp(2.6rem, 3.6vw, 4rem);
-  margin: 16px 0;
+  font-size: 42px;
+  margin: 0;
 }
 
-.profile-photo {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  margin-top: 10px;
-  box-shadow: var(--shadow);
-}
-
-.lead {
-  font-size: 1.1rem;
+.subtitle {
   color: var(--muted);
-  max-width: 520px;
+  margin-top: 8px;
 }
 
-.cta {
-  margin-top: 20px;
-  display: flex;
-  gap: 12px;
-}
+/* Buttons */
 
 .btn {
-  padding: 12px 22px;
-  border-radius: 999px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.primary {
+  display: inline-block;
+  margin-top: 12px;
+  margin-right: 10px;
+  padding: 10px 18px;
   background: var(--ink);
-  color: white;
+  color: var(--paper);
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
 }
 
-.secondary {
-  background: white;
-  border: 2px solid rgba(16,21,31,0.18);
+.btn:hover {
+  transform: translateY(-2px);
 }
 
-.profile-card {
-  background: var(--panel);
-  padding: 28px;
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-}
-
-.meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px,1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.meta strong {
-  font-size: 12px;
-  color: var(--muted);
-}
+/* Sections */
 
 section {
-  margin-top: 56px;
+  margin-top: 50px;
 }
 
 .section-title {
-  font-size: 1.5rem;
-  margin-bottom: 18px;
+  font-size: 26px;
+  margin-bottom: 20px;
+  font-family: "Playfair Display", serif;
+}
+
+/* Cards */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+  gap: 20px;
 }
 
 .card {
   background: var(--panel);
   padding: 20px;
-  border-radius: 18px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.6s;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
-  gap: 20px;
+.card.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.tag {
-  background: rgba(43,179,164,0.12);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 0.85rem;
+/* Images */
+
+.gallery-img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
 }
 
-.tag-list {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+/* Footer */
 
 footer {
   margin-top: 60px;
   padding-top: 20px;
-  border-top: 1px solid rgba(16,21,31,0.12);
+  border-top: 1px solid var(--muted);
   display: flex;
   justify-content: space-between;
+  color: var(--muted);
 }
 
-a { text-decoration: none; color: var(--accent); }
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
 
 </style>
+
 </head>
 
 <body>
 
+<button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
+
 <div class="page">
+
+<nav>
+<a href="index.html" class="logo"><img src="logo.png" alt="Logo" height="20px" width="20px"></a>
+<a href="projects.html">Projects</a>
+<a href="contact.html">Contact</a>
+</nav>
 
 <header>
 
-<div>
+<img src="profile.jpg" class="profile-photo" onclick="location.href='about.html'">
 
+<div>
 
 <h1>MD Badrudduza Alif</h1>
 
-<img src="profile.jpg" class="profile-photo" alt="Profile Photo">
-
-<p class="lead">
-Aspiring Software Developer and Technology Enthusiast focused on building modern,
-efficient, and user-friendly digital solutions. Based in Dhaka, Bangladesh.
-</p>
-
-<div class="cta">
-<a class="btn primary" href="#contact">Contact Me</a>
-<a class="btn secondary" href="#projects">View Projects</a>
+<div class="subtitle">
+Aspiring Software Developer | Dhaka, Bangladesh
 </div>
 
-</div>
-
-<div class="profile-card">
-
-<h2>Profile Snapshot</h2>
-
-<p>
-Student and aspiring software developer with strong interest in web development,
-programming, and modern technology. Passionate about continuous learning and
-professional growth.
-</p>
-
-<div class="meta">
-
-<div>
-<strong>Specialty</strong>
-Software Development
-</div>
-
-<div>
-<strong>Status</strong>
-Student
-</div>
-
-<div>
-<strong>Email</strong>
-mdbadrudduzaalif@gmail.com
-</div>
-
-<div>
-<strong>Location</strong>
-Dhaka, Bangladesh
-</div>
-
-</div>
+<a href="projects.html" class="btn">View Projects</a>
 
 </div>
 
 </header>
 
-<section>
-
-<h2 class="section-title">Skills</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>Technical Skills</h3>
-<div class="tag-list">
-<span class="tag">HTML</span>
-<span class="tag">CSS</span>
-<span class="tag">JavaScript</span>
-<span class="tag">Programming Basics</span>
-</div>
-</div>
-
-<div class="card">
-<h3>Professional Skills</h3>
-<div class="tag-list">
-<span class="tag">Communication</span>
-<span class="tag">Problem Solving</span>
-<span class="tag">Teamwork</span>
-<span class="tag">Time Management</span>
-</div>
-</div>
-
-</div>
-
-</section>
-
-<section id="projects">
-
-<h2 class="section-title">Projects</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>Personal Portfolio Website</h3>
-<p>Designed and developed a modern personal portfolio using HTML and CSS.</p>
-</div>
-
-<div class="card">
-<h3>Programming Practice Projects</h3>
-<p>Built multiple small projects while learning programming fundamentals.</p>
-</div>
-
-</div>
-
-</section>
+<!-- Achievements -->
 
 <section>
 
-<h2 class="section-title">Education</h2>
+<div class="section-title">Achievements</div>
 
 <div class="grid">
 
 <div class="card">
-<strong>Bachelor Degree (Ongoing)</strong>
-<p>University Student</p>
+
+<h3>1st Runners-Up — AUST Oscillon Ad Making Contest</h3>
+
+<p>
+Achieved 1st runners-up position in national-level advertisement making contest organized by AUST.
+</p>
+
+<img src="aust-oscillon.jpg" class="gallery-img">
+
 </div>
 
 <div class="card">
-<strong>Higher Secondary Certificate</strong>
-<p>Completed</p>
+
+<h3>Technical Workshop</h3>
+
+<p>
+Participated in technical workshops to improve development skills.
+</p>
+
+<img src="achievement2.jpg" class="gallery-img">
+
 </div>
 
 </div>
 
 </section>
 
-<section id="contact">
+<!-- Video CV -->
 
-<h2 class="section-title">Contact</h2>
+<section>
+
+<div class="section-title">Video CV</div>
+
+<div class="grid">
 
 <div class="card">
 
-<p>Student Mail : <a href="mailto:24-59369-3@student.aiub.edu">24-59369-3@student.aiub.edu</a></p>
+<h3>My Video CV</h3>
 
 <p>
-LinkedIn:
-<a href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/" target="_blank">
-Md Badrudduza Alif
-</a>
+Watch my video CV to learn more about my background, skills, and goals.
 </p>
 
-<p>
-GitHub:
-<a href="https://github.com/mdbadrudduzaalif" target="_blank">
-    mdbadrudduzaalif
-</a>
-</p>
+<a href="video-cv.html" class="btn">Watch Video CV</a>
+
+</div>
 
 </div>
 
@@ -332,6 +295,7 @@ GitHub:
 <span>© 2026 MD Badrudduza Alif</span>
 
 <span>
+<a href="cv.pdf" download>Download CV</a> |
 <a href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/">LinkedIn</a> |
 <a href="https://github.com/mdbadrudduzaalif">GitHub</a>
 </span>
@@ -339,6 +303,46 @@ GitHub:
 </footer>
 
 </div>
+
+<script>
+
+const btn = document.getElementById("themeBtn");
+
+if(localStorage.getItem("theme")==="light"){
+ document.documentElement.classList.remove("dark");
+ btn.textContent="🌙";
+}else{
+ document.documentElement.classList.add("dark");
+ btn.textContent="☀️";
+}
+
+function toggleTheme(){
+ document.documentElement.classList.toggle("dark");
+
+ if(document.documentElement.classList.contains("dark")){
+  localStorage.setItem("theme","dark");
+  btn.textContent="☀️";
+ }else{
+  localStorage.setItem("theme","light");
+  btn.textContent="🌙";
+ }
+}
+
+/* Animation */
+
+const observer = new IntersectionObserver(entries=>{
+ entries.forEach(entry=>{
+  if(entry.isIntersecting){
+   entry.target.classList.add("visible");
+  }
+ });
+});
+
+document.querySelectorAll(".card").forEach(card=>{
+ observer.observe(card);
+});
+
+</script>
 
 </body>
 </html>
