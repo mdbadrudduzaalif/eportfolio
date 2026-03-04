@@ -1,199 +1,266 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>MD Badrudduza Alif | Portfolio</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* Theme */
+/* GENERAL */
 
-:root {
-  --ink: #10151f;
-  --muted: #5a6678;
-  --accent: #ff7a3d;
-  --paper: #f6f3ef;
-  --panel: #ffffff;
-  --shadow: 0 18px 40px rgba(16,21,31,0.12);
+*{
+box-sizing:border-box;
 }
 
-.dark {
-  --ink: #f1f5f9;
-  --muted: #94a3b8;
-  --accent: #38bdf8;
-  --paper: #0f172a;
-  --panel: #1e293b;
-  --shadow: 0 18px 40px rgba(0,0,0,0.4);
+:root{
+--shadow:0 12px 28px rgba(2,6,23,0.45);
 }
 
-* {
-  box-sizing: border-box;
+body{
+margin:0;
+font-family:"Space Grotesk",sans-serif;
+background:#0b1a33;
+color:#f1f5f9;
+line-height:1.6;
 }
 
-body {
-  margin: 0;
-  font-family: "Space Grotesk", sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  transition: 0.4s;
+/* NAVBAR */
+
+nav{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+background:#1e293b;
+padding:16px clamp(16px,5vw,60px);
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:24px;
+z-index:1000;
+box-shadow:0 2px 10px rgba(0,0,0,0.4);
 }
 
-.page {
-  max-width: 1100px;
-  margin: auto;
-  padding: 40px 20px;
+nav a{
+color:#38bdf8;
+text-decoration:none;
+font-weight:600;
+font-size:15px;
 }
 
-/* Logo nav */
-
-nav {
-  margin-bottom: 30px;
-  font-weight: 600;
+nav a:hover{
+opacity:0.8;
 }
 
-nav a {
-  margin-right: 20px;
-  text-decoration: none;
-  color: var(--accent);
+.nav-home{
+display:inline-flex;
+align-items:center;
+line-height:1;
 }
 
-.logo {
-  font-family: "Playfair Display", serif;
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 2px;
+.home-icon{
+width:20px;
+height:20px;
+stroke:currentColor;
+fill:none;
+stroke-width:2;
+stroke-linecap:round;
+stroke-linejoin:round;
 }
 
-/* Theme toggle */
-
-.toggle-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: var(--panel);
-  border: none;
-  padding: 10px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: var(--shadow);
+.nav-links{
+display:flex;
+align-items:center;
+gap:24px;
+flex-wrap:wrap;
 }
 
-/* Header */
+/* PAGE */
 
-header {
-  display: grid;
-  grid-template-columns: 160px auto;
-  gap: 30px;
-  align-items: center;
+.page{
+max-width:1000px;
+margin:auto;
+padding:120px 20px 60px;
 }
 
-.profile-photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: center top;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: 0.3s;
+/* HERO */
+
+header{
+display:grid;
+grid-template-columns:160px auto;
+gap:30px;
+align-items:center;
+margin-bottom:40px;
 }
 
-.profile-photo:hover {
-  transform: scale(1.05);
+.profile-photo{
+width:150px;
+height:150px;
+border-radius:50%;
+object-fit:cover;
+object-position:center top;
+box-shadow:var(--shadow);
+cursor:pointer;
+transition:0.3s;
 }
 
-h1 {
-  font-family: "Playfair Display", serif;
-  font-size: 42px;
-  margin: 0;
+h1{
+font-family:"Playfair Display",serif;
+font-size:42px;
+margin:0;
 }
 
-.subtitle {
-  color: var(--muted);
-  margin-top: 8px;
+.subtitle{
+color:#94a3b8;
+margin-top:10px;
+font-size:16px;
 }
 
-/* Buttons */
+/* CARD */
 
-.btn {
-  display: inline-block;
-  margin-top: 12px;
-  margin-right: 10px;
-  padding: 10px 18px;
-  background: var(--ink);
-  color: var(--paper);
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.2s;
+.card{
+background:#1e293b;
+padding:28px;
+border-radius:14px;
+margin-top:30px;
+box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
-.btn:hover {
-  transform: translateY(-2px);
+.card h2{
+margin-top:0;
 }
 
-/* Sections */
+/* IMAGE */
 
-section {
-  margin-top: 50px;
+.project-img{
+width:100%;
+margin-top:15px;
+border-radius:10px;
+cursor:pointer;
+transition:0.3s;
 }
 
-.section-title {
-  font-size: 26px;
-  margin-bottom: 20px;
-  font-family: "Playfair Display", serif;
+.project-img:hover{
+transform:scale(1.02);
 }
 
-/* Cards */
+/* VIDEO */
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
-  gap: 20px;
+video{
+margin-top:15px;
+border-radius:10px;
 }
 
-.card {
-  background: var(--panel);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  opacity: 0;
-  transform: translateY(20px);
-  transition: 0.6s;
+.video-section{
+margin-top:36px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:26px;
+align-items:center;
 }
 
-.card.visible {
-  opacity: 1;
-  transform: translateY(0);
+.video-text p{
+margin:0 0 14px;
 }
 
-/* Images */
-
-.gallery-img {
-  width: 100%;
-  border-radius: 10px;
-  margin-top: 10px;
+.video-text p:last-child{
+margin-bottom:0;
 }
 
-/* Footer */
-
-footer {
-  margin-top: 60px;
-  padding-top: 20px;
-  border-top: 1px solid var(--muted);
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
+.video-player{
+width:100%;
 }
 
-footer a {
-  color: var(--accent);
-  text-decoration: none;
+.video-player video{
+display:block;
+width:100%;
+margin-top:0;
+border-radius:10px;
+}
+
+/* LIGHTBOX */
+
+.lightbox{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.9);
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.lightbox img{
+max-width:90%;
+max-height:90%;
+border-radius:10px;
+}
+
+/* FOOTER */
+
+footer{
+margin-top:60px;
+padding-top:20px;
+border-top:1px solid #475569;
+display:flex;
+justify-content:space-between;
+color:#94a3b8;
+}
+
+footer a{
+color:#38bdf8;
+text-decoration:none;
+margin-left:10px;
+}
+
+footer a:hover{
+opacity:0.8;
+}
+
+@media(max-width:768px){
+nav{
+padding:12px 16px;
+gap:12px;
+}
+
+.nav-links{
+width:100%;
+justify-content:space-between;
+gap:12px;
+}
+
+.page{
+padding:150px 16px 48px;
+}
+
+header{
+grid-template-columns:1fr;
+justify-items:center;
+text-align:center;
+}
+
+h1{
+font-size:34px;
+}
+
+.video-section{
+grid-template-columns:1fr;
+gap:18px;
+}
+
+footer{
+flex-direction:column;
+gap:10px;
+}
 }
 
 </style>
@@ -202,145 +269,145 @@ footer a {
 
 <body>
 
-<button class="toggle-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
+<!-- NAVBAR -->
+
+<nav>
+
+<a href="index.html" class="nav-home" aria-label="Home">
+<svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M3 10.5L12 3l9 7.5"></path>
+<path d="M5 9.5V21h14V9.5"></path>
+<path d="M10 21v-6h4v6"></path>
+</svg>
+</a>
+
+<div class="nav-links">
+<a href="projects.html">Projects</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+</div>
+
+</nav>
 
 <div class="page">
 
-<nav>
-<a href="index.html" class="logo"><img src="logo.png" alt="Logo" height="20px" width="20px"></a>
-<a href="projects.html">Projects</a>
-<a href="contact.html">Contact</a>
-</nav>
+<!-- HERO -->
 
 <header>
 
-<img src="profile.jpg" class="profile-photo" onclick="location.href='about.html'">
+<img src="profile.jpg" class="profile-photo">
 
 <div>
 
 <h1>MD Badrudduza Alif</h1>
 
 <div class="subtitle">
-Aspiring Software Developer | Dhaka, Bangladesh
+Aspiring AI Engineer | C++ & Java Developer | Dhaka, Bangladesh
 </div>
-
-<a href="projects.html" class="btn">View Projects</a>
 
 </div>
 
 </header>
 
-<!-- Achievements -->
+<!-- ABOUT -->
 
-<section>
+<section class="card">
 
-<div class="section-title">Achievements</div>
-
-<div class="grid">
-
-<div class="card">
-
-<h3>1st Runners-Up — AUST Oscillon Ad Making Contest</h3>
+<h2>About Me</h2>
 
 <p>
-Achieved 1st runners-up position in national-level advertisement making contest organized by AUST.
+I am currently pursuing a Bachelor of Science in Computer Science and Engineering (CSE). 
+My interests include software development, system design, and emerging technologies 
+such as artificial intelligence and automation systems.
 </p>
 
-<img src="aust-oscillon.jpg" class="gallery-img">
+<p>
+My programming background includes C++ and Java, and I regularly maintain and update 
+my GitHub repositories while working on small development projects and web-based applications.
+</p>
+
+</section>
+
+<!-- ACHIEVEMENTS -->
+
+<section class="card">
+
+<h2>Achievements</h2>
+
+<p>
+1st Runners-Up — AUST Oscillon Ad Making Contest. Collaborated in a team-based 
+creative project where we planned, developed, and presented an advertisement concept.
+</p>
+
+<img src="aust-oscillon.jpg" class="project-img" onclick="openLightbox(this)">
+
+<p><b>Location:</b> Ahsanullah University of Science and Technology (AUST), Dhaka</p>
+
+</section>
+
+<!-- VIDEO CV -->
+
+<section class="card video-section">
+
+<div class="video-text">
+
+<h2>Video CV</h2>
+
+<p>
+This short video introduces my academic background, programming experience,
+and career interests in software development and artificial intelligence.
+</p>
+
+<p>
+In this video I briefly discuss my education, technical skills, and the
+projects I have worked on while developing my programming foundation.
+</p>
 
 </div>
 
-<div class="card">
+<div class="video-player">
 
-<h3>Technical Workshop</h3>
-
-<p>
-Participated in technical workshops to improve development skills.
-</p>
-
-<img src="achievement2.jpg" class="gallery-img">
-
-</div>
+<video controls>
+<source src="video-cv.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
 
 </div>
 
 </section>
 
-<!-- Video CV -->
-
-<section>
-
-<div class="section-title">Video CV</div>
-
-<div class="grid">
-
-<div class="card">
-
-<h3>My Video CV</h3>
-
-<p>
-Watch my video CV to learn more about my background, skills, and goals.
-</p>
-
-<a href="video-cv.html" class="btn">Watch Video CV</a>
-
-</div>
-
-</div>
-
-</section>
+<!-- FOOTER -->
 
 <footer>
 
 <span>© 2026 MD Badrudduza Alif</span>
 
 <span>
-<a href="cv.pdf" download>Download CV</a> |
-<a href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/">LinkedIn</a> |
-<a href="https://github.com/mdbadrudduzaalif">GitHub</a>
+<a href="https://github.com/mdbadrudduzaalif">GitHub</a> |
+<a href="https://www.linkedin.com">LinkedIn</a> |
+<a href="cv.pdf">Download CV</a>
 </span>
 
 </footer>
 
 </div>
 
+<!-- LIGHTBOX -->
+
+<div id="lightbox" class="lightbox" onclick="closeLightbox()">
+<img id="lightbox-img">
+</div>
+
 <script>
 
-const btn = document.getElementById("themeBtn");
-
-if(localStorage.getItem("theme")==="light"){
- document.documentElement.classList.remove("dark");
- btn.textContent="🌙";
-}else{
- document.documentElement.classList.add("dark");
- btn.textContent="☀️";
+function openLightbox(img){
+document.getElementById("lightbox").style.display="flex";
+document.getElementById("lightbox-img").src=img.src;
 }
 
-function toggleTheme(){
- document.documentElement.classList.toggle("dark");
-
- if(document.documentElement.classList.contains("dark")){
-  localStorage.setItem("theme","dark");
-  btn.textContent="☀️";
- }else{
-  localStorage.setItem("theme","light");
-  btn.textContent="🌙";
- }
+function closeLightbox(){
+document.getElementById("lightbox").style.display="none";
 }
-
-/* Animation */
-
-const observer = new IntersectionObserver(entries=>{
- entries.forEach(entry=>{
-  if(entry.isIntersecting){
-   entry.target.classList.add("visible");
-  }
- });
-});
-
-document.querySelectorAll(".card").forEach(card=>{
- observer.observe(card);
-});
 
 </script>
 
