@@ -89,6 +89,29 @@ border-radius:14px;
 margin-top:25px;
 }
 
+.contact-item{
+display:flex;
+align-items:center;
+gap:8px;
+flex-wrap:wrap;
+}
+
+.social-icon{
+width:18px;
+height:18px;
+object-fit:contain;
+display:inline-block;
+}
+
+.contact-link{
+color:#38bdf8;
+text-decoration:none;
+}
+
+.contact-link:hover{
+opacity:0.8;
+}
+
 @media(max-width:768px){
 nav{
 padding:12px 16px;
@@ -142,11 +165,29 @@ font-size:34px;
 
 <p><b>Location:</b> Dhaka, Bangladesh</p>
 
-<p><b>LinkedIn:</b>  
-<a href="https://www.linkedin.com/in/md-badrudduza-alif">Profile</a></p>
+<p class="contact-item">
+<img src="linkedin.png" class="social-icon" alt="LinkedIn">
+<b>LinkedIn:</b>
+<a class="contact-link" href="https://www.linkedin.com/in/md-badrudduza-alif" target="_blank" rel="noopener noreferrer">Profile</a>
+</p>
 
-<p><b>GitHub:</b>  
-<a href="https://github.com/mdbadrudduzaalif">mdbadrudduzaalif</a></p>
+<p class="contact-item">
+<img src="github.png" class="social-icon" alt="GitHub">
+<b>GitHub:</b>
+<a class="contact-link" href="https://github.com/mdbadrudduzaalif" target="_blank" rel="noopener noreferrer">mdbadrudduzaalif</a>
+</p>
+
+<p class="contact-item">
+<img src="facebook.png" class="social-icon" alt="Facebook">
+<b>Facebook:</b>
+<a class="contact-link" href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook Profile</a>
+</p>
+
+<p class="contact-item">
+<img src="whatsapp.png" class="social-icon" alt="WhatsApp">
+<b>WhatsApp:</b>
+<a class="contact-link" href="https://www.whatsapp.com" target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+</p>
 
 </div>
 

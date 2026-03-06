@@ -209,21 +209,59 @@ border-radius:10px;
 
 footer{
 margin-top:60px;
-padding-top:20px;
-border-top:1px solid #475569;
+padding-top:22px;
+border-top:1px solid rgba(148,163,184,0.45);
 display:flex;
 justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:16px;
 color:#94a3b8;
 }
 
-footer a{
-color:#38bdf8;
-text-decoration:none;
-margin-left:10px;
+.footer-copy{
+font-size:14px;
 }
 
-footer a:hover{
-opacity:0.8;
+.footer-links{
+display:flex;
+align-items:center;
+justify-content:flex-end;
+gap:14px;
+flex-wrap:wrap;
+}
+
+.footer-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+color:#38bdf8;
+text-decoration:none;
+transition:transform 0.2s ease, opacity 0.2s ease;
+}
+
+.footer-icon{
+width:30px;
+height:30px;
+object-fit:contain;
+display:block;
+}
+
+.github-link .footer-icon{
+background:#ffffff;
+border-radius:6px;
+padding:2px;
+}
+
+.footer-link:hover{
+transform:translateY(-2px);
+opacity:0.9;
+}
+
+.footer-link:focus-visible{
+outline:2px solid #38bdf8;
+outline-offset:4px;
+border-radius:6px;
 }
 
 @media(max-width:768px){
@@ -259,7 +297,14 @@ gap:18px;
 
 footer{
 flex-direction:column;
-gap:10px;
+align-items:center;
+justify-content:center;
+gap:12px;
+text-align:center;
+}
+
+.footer-links{
+justify-content:center;
 }
 }
 
@@ -380,12 +425,21 @@ Your browser does not support the video tag.
 
 <footer>
 
-<span>© 2026 MD Badrudduza Alif</span>
+<span class="footer-copy">© 2026 MD Badrudduza Alif. All rights reserved.</span>
 
-<span>
-<a href="https://github.com/mdbadrudduzaalif">GitHub</a> |
-<a href="https://www.linkedin.com">LinkedIn</a> |
-<a href="cv.pdf">Download CV</a>
+<span class="footer-links">
+<a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
+<img src="github.png" class="footer-icon" alt="GitHub">
+</a>
+<a class="footer-link" href="https://www.linkedin.com" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+<img src="linkedin.png" class="footer-icon" alt="LinkedIn">
+</a>
+<a class="footer-link" href="https://www.facebook.com" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
+<img src="facebook.png" class="footer-icon" alt="Facebook">
+</a>
+<a class="footer-link" href="https://www.whatsapp.com" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+<img src="whatsapp.png" class="footer-icon" alt="WhatsApp">
+</a>
 </span>
 
 </footer>
