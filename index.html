@@ -158,13 +158,13 @@ border-radius:10px;
 }
 
 .video-section{
-margin-top:36px;
 display:grid;
-grid-template-columns:1fr 1fr;
+grid-template-columns:1.05fr 1fr;
 gap:26px;
-align-items:center;
+align-items:start;
+margin-top:30px;
 }
-
+  
 .video-text p{
 margin:0 0 14px;
 }
@@ -175,13 +175,33 @@ margin-bottom:0;
 
 .video-player{
 width:100%;
+max-width:540px;
+margin-left:auto;
 }
 
-.video-player video{
+.video-player iframe{
 display:block;
 width:100%;
-margin-top:0;
-border-radius:10px;
+aspect-ratio:16/9;
+height:auto;
+border-radius:12px;
+border:none;
+background:#0f172a;
+}
+
+.video-fallback{
+margin-top:10px;
+font-size:14px;
+color:#94a3b8;
+}
+
+.video-fallback a{
+color:#38bdf8;
+text-decoration:none;
+}
+
+.video-fallback a:hover{
+opacity:0.85;
 }
 
 /* LIGHTBOX */
@@ -293,6 +313,11 @@ font-size:34px;
 .video-section{
 grid-template-columns:1fr;
 gap:18px;
+}
+
+.video-player{
+max-width:100%;
+margin-left:0;
 }
 
 footer{
@@ -412,14 +437,23 @@ projects I have worked on while developing my programming foundation.
 
 <div class="video-player">
 
-<video controls>
-<source src="video-cv.mp4" type="video/mp4">
-Your browser does not support the video tag.
-</video>
+<iframe
+src="https://www.youtube-nocookie.com/embed/-4sTsMjOmxY?rel=0&modestbranding=1"
+title="Video CV"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+loading="lazy"
+referrerpolicy="strict-origin-when-cross-origin"
+allowfullscreen>
+</iframe>
+
+<p class="video-fallback">
+If playback is blocked, <a href="https://www.youtube.com/watch?v=-4sTsMjOmxY" target="_blank" rel="noopener noreferrer">watch on YouTube</a>.
+</p>
 
 </div>
 
 </section>
+  
 
 <!-- FOOTER -->
 
@@ -431,13 +465,13 @@ Your browser does not support the video tag.
 <a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
 <img src="github.png" class="footer-icon" alt="GitHub">
 </a>
-<a class="footer-link" href="https://www.linkedin.com" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
+<a class="footer-link" href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
 <img src="linkedin.png" class="footer-icon" alt="LinkedIn">
 </a>
-<a class="footer-link" href="https://www.facebook.com" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
+<a class="footer-link" href="https://www.facebook.com/mdbadrudduza.alif" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
 <img src="facebook.png" class="footer-icon" alt="Facebook">
 </a>
-<a class="footer-link" href="https://www.whatsapp.com" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+<a class="footer-link" href="https://wa.me/8801704448723" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
 <img src="whatsapp.png" class="footer-icon" alt="WhatsApp">
 </a>
 </span>
