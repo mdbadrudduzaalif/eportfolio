@@ -6,20 +6,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>MD Badrudduza Alif | Portfolio</title>
+<title>Education | MD Badrudduza Alif</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* GENERAL */
-
 *{
 box-sizing:border-box;
-}
-
-:root{
---shadow:0 12px 28px rgba(2,6,23,0.45);
 }
 
 body{
@@ -29,8 +23,6 @@ background:#0b1a33;
 color:#f1f5f9;
 line-height:1.6;
 }
-
-/* NAVBAR */
 
 nav{
 position:fixed;
@@ -96,33 +88,10 @@ border-radius:999px;
 box-shadow:0 0 0 2px rgba(56,189,248,0.25), 0 8px 18px rgba(56,189,248,0.25);
 }
 
-/* PAGE */
-
 .page{
 max-width:1000px;
 margin:auto;
 padding:120px 20px 60px;
-}
-
-/* HERO */
-
-header{
-display:grid;
-grid-template-columns:160px auto;
-gap:30px;
-align-items:center;
-margin-bottom:40px;
-}
-
-.profile-photo{
-width:150px;
-height:150px;
-border-radius:50%;
-object-fit:cover;
-object-position:center top;
-box-shadow:var(--shadow);
-cursor:pointer;
-transition:0.3s;
 }
 
 h1{
@@ -137,8 +106,6 @@ margin-top:10px;
 font-size:16px;
 }
 
-/* CARD */
-
 .card{
 background:#1e293b;
 padding:28px;
@@ -148,99 +115,64 @@ box-shadow:0 10px 30px rgba(0,0,0,0.35);
 }
 
 .card h2{
-margin-top:0;
+margin:0;
+font-family:"Playfair Display",serif;
+font-size:34px;
 }
 
-/* IMAGE */
-
-.project-img{
-width:100%;
-margin-top:15px;
-border-radius:10px;
-cursor:pointer;
-transition:0.3s;
-}
-
-.project-img:hover{
-transform:scale(1.02);
-}
-
-/* VIDEO */
-
-video{
-margin-top:15px;
-border-radius:10px;
-}
-
-.video-section{
+.edu-entry{
 display:grid;
-grid-template-columns:1.05fr 1fr;
+grid-template-columns:280px 1fr;
 gap:26px;
 align-items:start;
-margin-top:30px;
-}
-  
-.video-text p{
-margin:0 0 14px;
 }
 
-.video-text p:last-child{
-margin-bottom:0;
-}
-
-.video-player{
+.edu-image{
 width:100%;
-max-width:540px;
-margin-left:auto;
-}
-
-.video-player iframe{
-display:block;
-width:100%;
-aspect-ratio:16/9;
-height:auto;
+aspect-ratio:4/3;
+border:2px dashed #475569;
 border-radius:12px;
-border:none;
-background:#0f172a;
-}
-
-.video-fallback{
-margin-top:10px;
-font-size:14px;
-color:#94a3b8;
-}
-
-.video-fallback a{
-color:#38bdf8;
+background:linear-gradient(135deg,rgba(15,23,42,0.75),rgba(30,41,59,0.95));
+display:grid;
+place-items:center;
 text-decoration:none;
+color:#94a3b8;
+font-weight:600;
+text-align:center;
+padding:14px;
+transition:transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
 
-.video-fallback a:hover{
-opacity:0.85;
+.edu-image:hover{
+transform:translateY(-2px);
+border-color:#38bdf8;
+color:#38bdf8;
+background:linear-gradient(135deg,rgba(15,23,42,0.92),rgba(30,41,59,1));
 }
 
-/* LIGHTBOX */
-
-.lightbox{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.9);
-justify-content:center;
-align-items:center;
-z-index:999;
+.edu-image:focus-visible{
+outline:2px solid #38bdf8;
+outline-offset:3px;
 }
 
-.lightbox img{
-max-width:90%;
-max-height:90%;
-border-radius:10px;
+.icon-label{
+font-size:14px;
+line-height:1.4;
 }
 
-/* FOOTER */
+.edu-list{
+margin:16px 0 0;
+padding:0;
+list-style:none;
+display:grid;
+gap:10px;
+}
+
+.edu-list li span{
+color:#94a3b8;
+font-weight:500;
+margin-right:8px;
+}
 
 footer{
 margin-top:60px;
@@ -315,24 +247,21 @@ gap:12px;
 padding:150px 16px 48px;
 }
 
-header{
-grid-template-columns:1fr;
-justify-items:center;
-text-align:center;
-}
-
 h1{
 font-size:34px;
 }
 
-.video-section{
+.card h2{
+font-size:30px;
+}
+
+.edu-entry{
 grid-template-columns:1fr;
 gap:18px;
 }
 
-.video-player{
-max-width:100%;
-margin-left:0;
+.edu-image{
+aspect-ratio:16/9;
 }
 
 footer{
@@ -354,11 +283,9 @@ justify-content:center;
 
 <body>
 
-<!-- NAVBAR -->
-
 <nav>
 
-<a href="index.html" class="nav-home active" aria-label="Home">
+<a href="index.html" class="nav-home" aria-label="Home">
 <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
 <path d="M3 10.5L12 3l9 7.5"></path>
 <path d="M5 9.5V21h14V9.5"></path>
@@ -369,7 +296,7 @@ justify-content:center;
 <div class="nav-links">
 <a href="projects.html">Projects</a>
 <a href="about.html">About</a>
-<a href="education.html">Education</a>
+<a class="active" href="education.html">Education</a>
 <a href="resume.html">Resume</a>
 <a href="contact.html">Contact</a>
 </div>
@@ -378,101 +305,61 @@ justify-content:center;
 
 <div class="page">
 
-<!-- HERO -->
+<section class="card">
+<h1>Education</h1>
+<div class="subtitle">Academic background and progress</div>
+</section>
 
-<header>
-
-<img src="profile.jpg" class="profile-photo">
-
+<section class="card">
+<div class="edu-entry">
+<a class="edu-image" href="bsc-icon.png" aria-label="B.Sc. icon placeholder">
+<span class="icon-label">Upload B.Sc. icon<br>(bsc-icon.png)</span>
+</a>
 <div>
-
-<h1>MD Badrudduza Alif</h1>
-
-<div class="subtitle">
-Aspiring AI Engineer | C++ & Java Developer | Dhaka, Bangladesh
+<h2>B.Sc.</h2>
+<ul class="edu-list">
+<li><span>Institution:</span> American International University-Bangladesh (AIUB)</li>
+<li><span>Board/University/Major:</span> CSE</li>
+<li><span>Passing Year:</span> 2029</li>
+<li><span>Result (GPA/CGPA):</span> 3.60</li>
+</ul>
 </div>
-
 </div>
-
-</header>
-
-<!-- ABOUT -->
+</section>
 
 <section class="card">
-
-<h2>About Me</h2>
-
-<p>
-I am currently pursuing a Bachelor of Science in Computer Science and Engineering (CSE). 
-My interests include software development, system design, and emerging technologies 
-such as artificial intelligence and automation systems.
-</p>
-
-<p>
-My programming background includes C++ and Java, and I regularly maintain and update 
-my GitHub repositories while working on small development projects and web-based applications.
-</p>
-
+<div class="edu-entry">
+<a class="edu-image" href="hsc-icon.png" aria-label="H.S.C. icon placeholder">
+<span class="icon-label">Upload H.S.C. icon<br>(hsc-icon.png)</span>
+</a>
+<div>
+<h2>H.S.C</h2>
+<ul class="edu-list">
+<li><span>Institution:</span> Milestone College</li>
+<li><span>Board/University/Major:</span> Dhaka Board</li>
+<li><span>Passing Year:</span> 2023</li>
+<li><span>Result (GPA/CGPA):</span> 4.92</li>
+</ul>
+</div>
+</div>
 </section>
-
-<!-- ACHIEVEMENTS -->
 
 <section class="card">
-
-<h2>Achievements</h2>
-
-<p>
-1st Runners-Up — AUST Oscillon Ad Making Contest. Collaborated in a team-based 
-creative project where we planned, developed, and presented an advertisement concept.
-</p>
-
-<img src="aust-oscillon.jpg" class="project-img" onclick="openLightbox(this)">
-
-<p><b>Location:</b> Ahsanullah University of Science and Technology (AUST), Dhaka</p>
-
-</section>
-
-<!-- VIDEO CV -->
-
-<section class="card video-section">
-
-<div class="video-text">
-
-<h2>Video CV</h2>
-
-<p>
-This short video introduces my academic background, programming experience,
-and career interests in software development and artificial intelligence.
-</p>
-
-<p>
-In this video I briefly discuss my education, technical skills, and the
-projects I have worked on while developing my programming foundation.
-</p>
-
+<div class="edu-entry">
+<a class="edu-image" href="ssc-icon.png" aria-label="S.S.C. icon placeholder">
+<span class="icon-label">Upload S.S.C. icon<br>(ssc-icon.png)</span>
+</a>
+<div>
+<h2>S.S.C</h2>
+<ul class="edu-list">
+<li><span>Institution:</span> Milestone College</li>
+<li><span>Board/University/Major:</span> Dhaka Board</li>
+<li><span>Passing Year:</span> 2021</li>
+<li><span>Result (GPA/CGPA):</span> 4.72</li>
+</ul>
 </div>
-
-<div class="video-player">
-
-<iframe
-src="https://www.youtube-nocookie.com/embed/-4sTsMjOmxY?rel=0&modestbranding=1"
-title="Video CV"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-loading="lazy"
-referrerpolicy="strict-origin-when-cross-origin"
-allowfullscreen>
-</iframe>
-
-<p class="video-fallback">
-If playback is blocked, <a href="https://www.youtube.com/watch?v=-4sTsMjOmxY" target="_blank" rel="noopener noreferrer">watch on YouTube</a>.
-</p>
-
 </div>
-
 </section>
-  
-
-<!-- FOOTER -->
 
 <footer>
 
@@ -496,25 +383,6 @@ If playback is blocked, <a href="https://www.youtube.com/watch?v=-4sTsMjOmxY" ta
 </footer>
 
 </div>
-
-<!-- LIGHTBOX -->
-
-<div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<img id="lightbox-img">
-</div>
-
-<script>
-
-function openLightbox(img){
-document.getElementById("lightbox").style.display="flex";
-document.getElementById("lightbox-img").src=img.src;
-}
-
-function closeLightbox(){
-document.getElementById("lightbox").style.display="none";
-}
-
-</script>
 
 </body>
 </html>
