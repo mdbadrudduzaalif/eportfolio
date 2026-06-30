@@ -20,12 +20,15 @@ class NavBar extends HTMLElement {
         `;
 
         const path = window.location.pathname;
-        const page = path.split("/").pop() || "index.html";
+        let page = path.split("/").pop();
+        if (!page) {
+            page = "index.html";
+        }
 
         const links = this.querySelectorAll('a');
         links.forEach(link => {
             const href = link.getAttribute('href');
-            if (href === page || (page === '' && href === 'index.html')) {
+            if (href === page) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
             } else {
@@ -36,6 +39,35 @@ class NavBar extends HTMLElement {
     }
 }
 customElements.define('nav-bar', NavBar);
+
+class ImageLightbox extends HTMLElement {
+    connectedCallback() {
+        this.innerHTML = `
+<div class="lightbox" style="display: none;">
+<img class="lightbox-img" alt="Enlarged view">
+</div>
+        `;
+        const lightbox = this.querySelector('.lightbox');
+        lightbox.addEventListener('click', () => this.close());
+    }
+
+    open(src) {
+        const lightbox = this.querySelector('.lightbox');
+        const img = this.querySelector('.lightbox-img');
+        if (lightbox && img) {
+            img.src = src;
+            lightbox.style.display = 'flex';
+        }
+    }
+
+    close() {
+        const lightbox = this.querySelector('.lightbox');
+        if (lightbox) {
+            lightbox.style.display = 'none';
+        }
+    }
+}
+customElements.define('image-lightbox', ImageLightbox);
 
 class SiteFooter extends HTMLElement {
     connectedCallback() {

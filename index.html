@@ -20,13 +20,13 @@
 
 <nav-bar></nav-bar>
 
-<div class="page home">
+<main class="page home">
 
 <!-- HERO -->
 
 <header>
 
-<img src="profile.jpg" class="profile-photo">
+<img src="profile.jpg" class="profile-photo" alt="Profile photo of MD Badrudduza Alif" loading="lazy">
 
 <div>
 
@@ -70,7 +70,7 @@ my GitHub repositories while working on small development projects and web-based
 creative project where we planned, developed, and presented an advertisement concept.
 </p>
 
-<img src="aust-oscillon.jpg" class="project-img" onclick="openLightbox(this)">
+<img src="aust-oscillon.jpg" class="project-img" alt="AUST Oscillon Ad Making Contest" loading="lazy" onclick="document.querySelector('image-lightbox').open(this.src)">
 
 <p><b>Location:</b> Ahsanullah University of Science and Technology (AUST), Dhaka</p>
 
@@ -120,26 +120,11 @@ If playback is blocked, <a href="https://www.youtube.com/watch?v=-4sTsMjOmxY" ta
 
 <site-footer></site-footer>
 
-</div>
+</main>
 
 <!-- LIGHTBOX -->
 
-<div id="lightbox" class="lightbox" onclick="closeLightbox()">
-<img id="lightbox-img">
-</div>
-
-<script>
-
-function openLightbox(img){
-document.getElementById("lightbox").style.display="flex";
-document.getElementById("lightbox-img").src=img.src;
-}
-
-function closeLightbox(){
-document.getElementById("lightbox").style.display="none";
-}
-
-</script>
+<image-lightbox></image-lightbox>
 
 <script src="components.js"></script>
 </body>
