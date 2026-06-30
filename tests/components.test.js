@@ -37,9 +37,10 @@ describe('Web Components', () => {
     it('renders <site-footer> correctly', () => {
         const footer = document.createElement('site-footer');
         document.body.appendChild(footer);
+        const currentYear = new Date().getFullYear();
 
         expect(footer.querySelector('footer')).not.toBeNull();
-        expect(footer.querySelector('.footer-copy').textContent).toContain('© 2026 MD Badrudduza Alif');
+        expect(footer.querySelector('.footer-copy').textContent).toContain(`© ${currentYear} MD Badrudduza Alif`);
     });
 
     it('renders <image-lightbox> correctly and can open/close', () => {
@@ -48,9 +49,11 @@ describe('Web Components', () => {
 
         const lightboxDiv = lightboxComp.querySelector('.lightbox');
         const img = lightboxComp.querySelector('.lightbox-img');
+        const closeBtn = lightboxComp.querySelector('.lightbox-close');
 
         expect(lightboxDiv).not.toBeNull();
         expect(img).not.toBeNull();
+        expect(closeBtn).not.toBeNull();
         expect(lightboxDiv.style.display).toBe('none');
 
         // Test open
@@ -60,8 +63,14 @@ describe('Web Components', () => {
         expect(lightboxDiv.style.display).toBe('flex');
         expect(img.src).toBe(testSrc);
 
-        // Test close
-        lightboxComp.close();
+        // Test close with close button
+        closeBtn.click();
+        expect(lightboxDiv.style.display).toBe('none');
+
+        // Test close with escape key
+        lightboxComp.open(testSrc);
+        expect(lightboxDiv.style.display).toBe('flex');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
         expect(lightboxDiv.style.display).toBe('none');
     });
 });
