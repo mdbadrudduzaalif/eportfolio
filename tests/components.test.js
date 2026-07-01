@@ -58,14 +58,31 @@ describe('Web Components', () => {
 
         // Test open
         const testSrc = 'http://localhost/test-image.jpg';
+
+        // Add a dummy focused element to test focus restoration
+        const dummyBtn = document.createElement('button');
+        document.body.appendChild(dummyBtn);
+        dummyBtn.focus();
+
         lightboxComp.open(testSrc);
 
         expect(lightboxDiv.style.display).toBe('flex');
         expect(img.src).toBe(testSrc);
 
+        // Test ARIA attributes
+        expect(lightboxDiv.getAttribute('role')).toBe('dialog');
+        expect(lightboxDiv.getAttribute('aria-modal')).toBe('true');
+        expect(lightboxDiv.getAttribute('aria-label')).toBe('Image Lightbox');
+
+        // Check if close button is focused
+        expect(document.activeElement).toBe(closeBtn);
+
         // Test close with close button
         closeBtn.click();
         expect(lightboxDiv.style.display).toBe('none');
+
+        // Check if previous focus is restored
+        expect(document.activeElement).toBe(dummyBtn);
 
         // Test close with escape key
         lightboxComp.open(testSrc);
