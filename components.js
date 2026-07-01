@@ -44,11 +44,23 @@ class ImageLightbox extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
 <div class="lightbox" style="display: none;">
+<button class="lightbox-close" aria-label="Close lightbox">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 </div>
         `;
         const lightbox = this.querySelector('.lightbox');
-        lightbox.addEventListener('click', () => this.close());
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox || e.target.classList.contains('lightbox-close')) {
+                this.close();
+            }
+        });
+
+        // Escape key listener
+        this._handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                this.close();
+            }
+        };
     }
 
     open(src) {
@@ -57,6 +69,7 @@ class ImageLightbox extends HTMLElement {
         if (lightbox && img) {
             img.src = src;
             lightbox.style.display = 'flex';
+            document.addEventListener('keydown', this._handleKeyDown);
         }
     }
 
@@ -64,16 +77,30 @@ class ImageLightbox extends HTMLElement {
         const lightbox = this.querySelector('.lightbox');
         if (lightbox) {
             lightbox.style.display = 'none';
+            document.removeEventListener('keydown', this._handleKeyDown);
         }
     }
 }
 customElements.define('image-lightbox', ImageLightbox);
 
+// Global listener for images with data-lightbox attribute
+document.addEventListener('click', (e) => {
+    if (e.target.matches('img[data-lightbox]')) {
+        let lightbox = document.querySelector('image-lightbox');
+        if (!lightbox) {
+            lightbox = document.createElement('image-lightbox');
+            document.body.appendChild(lightbox);
+        }
+        lightbox.open(e.target.src);
+    }
+});
+
 class SiteFooter extends HTMLElement {
     connectedCallback() {
+        const currentYear = new Date().getFullYear();
         this.innerHTML = `
 <footer>
-<span class="footer-copy">© 2026 MD Badrudduza Alif. All rights reserved.</span>
+<span class="footer-copy">© ${currentYear} MD Badrudduza Alif. All rights reserved.</span>
 <span class="footer-links">
 <a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
 <img src="github.png" class="footer-icon" alt="GitHub">
