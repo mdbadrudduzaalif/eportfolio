@@ -18,6 +18,10 @@ box-sizing:border-box;
 --nav-active-text: #0b1a33;
 }
 
+html{
+scroll-behavior: smooth;
+}
+
 body{
 margin:0;
 font-family:"Space Grotesk",sans-serif;
@@ -449,12 +453,23 @@ object-fit:contain;
 display:inline-block;
 }
 
-.contact-link{
+.contact-link,
+.contact-link-accent{
 color: var(--accent);
 text-decoration:none;
 }
 
-.contact-link:hover{
+.contact-link:hover,
+.contact-link-accent:hover{
+opacity:0.8;
+}
+
+.contact-link-plain{
+color: inherit;
+text-decoration: none;
+}
+
+.contact-link-plain:hover{
 opacity:0.8;
 }
 

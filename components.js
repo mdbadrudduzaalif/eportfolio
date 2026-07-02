@@ -19,16 +19,24 @@ class NavBar extends HTMLElement {
 </nav>
         `;
 
-        const path = window.location.pathname;
+        let path = window.location.pathname;
+        if (path.endsWith('/')) {
+            path = path.slice(0, -1);
+        }
         let page = path.split("/").pop();
         if (!page) {
             page = "index.html";
         }
 
+        // Handle routes without .html (e.g., /about)
+        if (page !== "index.html" && !page.includes(".")) {
+            page += ".html";
+        }
+
         const links = this.querySelectorAll('a');
         links.forEach(link => {
             const href = link.getAttribute('href');
-            if (href === page) {
+            if (href === page || (href === "index.html" && page === "")) {
                 link.classList.add('active');
                 link.setAttribute('aria-current', 'page');
             } else {
@@ -43,8 +51,8 @@ customElements.define('nav-bar', NavBar);
 class ImageLightbox extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-<div class="lightbox" style="display: none;">
-<button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+<div class="lightbox" style="display: none;" role="dialog" aria-modal="true" aria-label="Image Lightbox">
+<button class="lightbox-close" aria-label="Close lightbox" tabindex="0">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 </div>
         `;
@@ -61,15 +69,24 @@ class ImageLightbox extends HTMLElement {
                 this.close();
             }
         };
+
+        this._triggeringElement = null;
     }
 
-    open(src) {
+    open(src, altText = "Enlarged view", triggeringElement = null) {
+        this._triggeringElement = triggeringElement;
         const lightbox = this.querySelector('.lightbox');
         const img = this.querySelector('.lightbox-img');
+        const closeBtn = this.querySelector('.lightbox-close');
         if (lightbox && img) {
             img.src = src;
+            img.alt = altText;
             lightbox.style.display = 'flex';
             document.addEventListener('keydown', this._handleKeyDown);
+
+            if (closeBtn) {
+                closeBtn.focus();
+            }
         }
     }
 
@@ -78,6 +95,11 @@ class ImageLightbox extends HTMLElement {
         if (lightbox) {
             lightbox.style.display = 'none';
             document.removeEventListener('keydown', this._handleKeyDown);
+
+            if (this._triggeringElement) {
+                this._triggeringElement.focus();
+                this._triggeringElement = null;
+            }
         }
     }
 }
@@ -91,7 +113,7 @@ document.addEventListener('click', (e) => {
             lightbox = document.createElement('image-lightbox');
             document.body.appendChild(lightbox);
         }
-        lightbox.open(e.target.src);
+        lightbox.open(e.target.src, e.target.alt, e.target);
     }
 });
 
@@ -103,16 +125,16 @@ class SiteFooter extends HTMLElement {
 <span class="footer-copy">© ${currentYear} MD Badrudduza Alif. All rights reserved.</span>
 <span class="footer-links">
 <a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
-<img src="github.png" class="footer-icon" alt="GitHub">
+<img src="github.png" class="footer-icon" alt="GitHub" loading="lazy">
 </a>
 <a class="footer-link" href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
-<img src="linkedin.png" class="footer-icon" alt="LinkedIn">
+<img src="linkedin.png" class="footer-icon" alt="LinkedIn" loading="lazy">
 </a>
 <a class="footer-link" href="https://www.facebook.com/mdbadrudduza.alif" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
-<img src="facebook.png" class="footer-icon" alt="Facebook">
+<img src="facebook.png" class="footer-icon" alt="Facebook" loading="lazy">
 </a>
 <a class="footer-link" href="https://wa.me/8801704448723" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
-<img src="whatsapp.png" class="footer-icon" alt="WhatsApp">
+<img src="whatsapp.png" class="footer-icon" alt="WhatsApp" loading="lazy">
 </a>
 </span>
 </footer>
