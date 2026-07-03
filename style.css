@@ -18,6 +18,10 @@ box-sizing:border-box;
 --nav-active-text: #0b1a33;
 }
 
+html{
+scroll-behavior:smooth;
+}
+
 body{
 margin:0;
 font-family:"Space Grotesk",sans-serif;
