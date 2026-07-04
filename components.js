@@ -1,7 +1,7 @@
 class NavBar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-<nav>
+<nav aria-label="Main Navigation">
 <a href="index.html" class="nav-home" aria-label="Home">
 <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
 <path d="M3 10.5L12 3l9 7.5"></path>
@@ -20,7 +20,7 @@ class NavBar extends HTMLElement {
         `;
 
         const path = window.location.pathname;
-        let page = path.split("/").pop();
+        let page = path.split("/").pop().split('?')[0].split('#')[0];
         if (!page) {
             page = "index.html";
         }
@@ -77,6 +77,12 @@ class ImageLightbox extends HTMLElement {
         const lightbox = this.querySelector('.lightbox');
         if (lightbox) {
             lightbox.style.display = 'none';
+            document.removeEventListener('keydown', this._handleKeyDown);
+        }
+    }
+
+    disconnectedCallback() {
+        if (this._handleKeyDown) {
             document.removeEventListener('keydown', this._handleKeyDown);
         }
     }

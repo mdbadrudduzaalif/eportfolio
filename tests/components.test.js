@@ -34,6 +34,18 @@ describe('Web Components', () => {
         expect(activeLink.classList.contains('nav-home')).toBe(true);
     });
 
+    it('nav-bar active link ignores query parameters and hash', () => {
+        delete window.location;
+        window.location = new URL('http://localhost/about.html?param=value#section');
+
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
+
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        expect(activeLink.textContent.trim()).toBe('About');
+    });
+
     it('renders <site-footer> correctly', () => {
         const footer = document.createElement('site-footer');
         document.body.appendChild(footer);
@@ -72,5 +84,31 @@ describe('Web Components', () => {
         expect(lightboxDiv.style.display).toBe('flex');
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
         expect(lightboxDiv.style.display).toBe('none');
+    });
+
+    it('removes keydown listener when image-lightbox is removed', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
+
+        lightboxComp.open('http://localhost/test-image.jpg');
+        const lightboxDiv = lightboxComp.querySelector('.lightbox');
+        expect(lightboxDiv.style.display).toBe('flex');
+
+        // Remove element, which should trigger disconnectedCallback
+        document.body.removeChild(lightboxComp);
+
+        // Dispatch Escape key - if listener wasn't removed it would throw error or try to access disconnected DOM,
+        // though JS won't strictly crash, we can spy on removeEventListener or just ensure it completes cleanly.
+        const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+
+        // Let's do it with a fresh component to actually catch the spy
+        const comp2 = document.createElement('image-lightbox');
+        document.body.appendChild(comp2);
+        comp2.open('http://localhost/test-image.jpg');
+
+        document.body.removeChild(comp2);
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
+        removeEventListenerSpy.mockRestore();
     });
 });
