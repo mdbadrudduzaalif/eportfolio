@@ -90,4 +90,13 @@ describe('Web Components', () => {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
         expect(lightboxDiv.style.display).toBe('none');
     });
+
+    it('does not throw when close() is called and lightbox element is missing', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
+        lightboxComp.innerHTML = ''; // Simulate missing lightbox element
+        expect(() => {
+            lightboxComp.close();
+        }).not.toThrow();
+    });
 });
