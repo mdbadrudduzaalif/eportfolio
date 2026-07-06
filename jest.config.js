@@ -1,7 +1,7 @@
 module.exports = {
-  testEnvironment: 'jsdom',
-  setupFiles: ['./jest.setup.js'],
+  testEnvironment: "jsdom",
+  setupFiles: ["./jest.setup.js"],
   testEnvironmentOptions: {
-    url: 'http://localhost/projects.html',
+    url: "http://localhost/projects.html",
   },
 };

@@ -137,3 +137,18 @@ class SiteFooter extends HTMLElement {
     }
 }
 customElements.define('site-footer', SiteFooter);
+
+class SecureEmail extends HTMLElement {
+    connectedCallback() {
+        const encodedEmail = this.getAttribute('data-email');
+        if (encodedEmail) {
+            try {
+                const email = atob(encodedEmail);
+                this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+            } catch (e) {
+                console.error('Failed to decode email', e);
+            }
+        }
+    }
+}
+customElements.define('secure-email', SecureEmail);
