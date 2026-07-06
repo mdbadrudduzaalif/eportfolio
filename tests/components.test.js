@@ -20,6 +20,20 @@ describe('Web Components', () => {
         expect(activeLink.getAttribute('aria-current')).toBe('page');
     });
 
+    it('nav-bar sets no active link when path does not match any href', () => {
+        delete window.location;
+        window.location = new URL('http://localhost/unknown.html');
+
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
+
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).toBeNull();
+
+        const ariaCurrent = nav.querySelector('a[aria-current="page"]');
+        expect(ariaCurrent).toBeNull();
+    });
+
     it('nav-bar falls back to index.html when path is empty or root', () => {
         // Change jsdom url to root
         delete window.location;
