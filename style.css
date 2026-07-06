@@ -472,7 +472,8 @@ gap:12px;
 
 .nav-links{
 width:100%;
-justify-content:space-between;
+flex-wrap: wrap;
+justify-content:center;
 gap:12px;
 }
 
