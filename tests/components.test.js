@@ -90,4 +90,15 @@ describe('Web Components', () => {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
         expect(lightboxDiv.style.display).toBe('none');
     });
+    it('renders <secure-email> correctly with decoded email', () => {
+        const secureEmail = document.createElement('secure-email');
+        const encodedEmail = btoa('test@example.com');
+        secureEmail.setAttribute('data-email', encodedEmail);
+        document.body.appendChild(secureEmail);
+
+        const aTag = secureEmail.querySelector('a');
+        expect(aTag).not.toBeNull();
+        expect(aTag.getAttribute('href')).toBe('mailto:test@example.com');
+        expect(aTag.textContent).toBe('test@example.com');
+    });
 });
