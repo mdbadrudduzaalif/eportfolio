@@ -1,3 +1,5 @@
+'use strict';
+
 class NavBar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
@@ -19,20 +21,15 @@ class NavBar extends HTMLElement {
 </nav>
         `;
 
-        let path = window.location.pathname;
-        let page = path.split("/").pop();
-
-        // Strip query params and hashes if present (though pathname usually doesn't have them,
-        // it's safer to handle the full URL to be robust, but let's just make sure we strip them if somehow attached)
-        if (page.includes('?')) {
-            page = page.split('?')[0];
-        }
-        if (page.includes('#')) {
-            page = page.split('#')[0];
-        }
-
-        if (!page) {
-            page = "index.html";
+        let page = "index.html";
+        try {
+            const path = new URL(window.location.href).pathname;
+            const parsedPage = path.split("/").pop();
+            if (parsedPage) {
+                page = parsedPage;
+            }
+        } catch (e) {
+            // Fallback for invalid URLs if any, though location.href is typically valid
         }
 
         const links = this.querySelectorAll('a');
@@ -51,14 +48,9 @@ class NavBar extends HTMLElement {
 customElements.define('nav-bar', NavBar);
 
 class ImageLightbox extends HTMLElement {
-    constructor() {
-        super();
-        this._openingElement = null;
-    }
-
     connectedCallback() {
         this.innerHTML = `
-<div class="lightbox" style="display: none;" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image View">
+<div class="lightbox" style="display: none;" role="dialog" aria-modal="true" aria-label="Image Lightbox">
 <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 </div>
@@ -78,19 +70,16 @@ class ImageLightbox extends HTMLElement {
         };
     }
 
-    open(src, openingElement = null) {
-        this._openingElement = openingElement;
+    open(src) {
         const lightbox = this.querySelector('.lightbox');
         const img = this.querySelector('.lightbox-img');
         const closeBtn = this.querySelector('.lightbox-close');
 
         if (lightbox && img) {
+            this._previousFocus = document.activeElement;
             img.src = src;
             lightbox.style.display = 'flex';
-            lightbox.setAttribute('aria-hidden', 'false');
             document.addEventListener('keydown', this._handleKeyDown);
-
-            // Focus the close button for accessibility
             if (closeBtn) {
                 closeBtn.focus();
             }
@@ -101,13 +90,10 @@ class ImageLightbox extends HTMLElement {
         const lightbox = this.querySelector('.lightbox');
         if (lightbox) {
             lightbox.style.display = 'none';
-            lightbox.setAttribute('aria-hidden', 'true');
             document.removeEventListener('keydown', this._handleKeyDown);
-
-            // Restore focus to the element that opened the lightbox
-            if (this._openingElement) {
-                this._openingElement.focus();
-                this._openingElement = null;
+            if (this._previousFocus) {
+                this._previousFocus.focus();
+                this._previousFocus = null;
             }
         }
     }
@@ -122,7 +108,7 @@ document.addEventListener('click', (e) => {
             lightbox = document.createElement('image-lightbox');
             document.body.appendChild(lightbox);
         }
-        lightbox.open(e.target.src, e.target);
+        lightbox.open(e.target.src);
     }
 });
 
