@@ -370,10 +370,6 @@ outline:2px solid var(--accent);
 outline-offset:3px;
 }
 
-.icon-label{
-font-size:14px;
-line-height:1.4;
-}
 
 .edu-list{
 margin:16px 0 0;
@@ -402,6 +398,25 @@ gap:8px;
 color: var(--text-muted);
 font-weight:500;
 margin-right:8px;
+}
+
+.resume-table{
+width:100%;
+border-collapse:collapse;
+min-width:760px;
+}
+
+.resume-table th,
+.resume-table td{
+padding:12px 10px;
+border-bottom:1px solid var(--border-dark);
+text-align:left;
+vertical-align:top;
+}
+
+.resume-table th{
+color: var(--text-muted);
+font-weight:600;
 }
 
 .bullet-list{
