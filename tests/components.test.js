@@ -90,4 +90,22 @@ describe('Web Components', () => {
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
         expect(lightboxDiv.style.display).toBe('none');
     });
+
+    it('image-lightbox does not throw when internal elements are missing', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
+
+        // Clear inner HTML to simulate missing elements
+        lightboxComp.innerHTML = '';
+
+        // Calling open should not throw an error
+        expect(() => {
+            lightboxComp.open('http://localhost/test.jpg');
+        }).not.toThrow();
+
+        // Calling close should also not throw an error
+        expect(() => {
+            lightboxComp.close();
+        }).not.toThrow();
+    });
 });
