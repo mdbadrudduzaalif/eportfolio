@@ -374,10 +374,6 @@ outline:2px solid var(--accent);
 outline-offset:3px;
 }
 
-.icon-label{
-font-size:14px;
-line-height:1.4;
-}
 
 .edu-list{
 margin:16px 0 0;
@@ -406,10 +402,6 @@ gap:8px;
 color: var(--text-muted);
 font-weight:500;
 margin-right:8px;
-}
-
-.table-wrap{
-overflow-x:auto;
 }
 
 .resume-table{
@@ -487,7 +479,8 @@ gap:12px;
 
 .nav-links{
 width:100%;
-justify-content:space-between;
+flex-wrap: wrap;
+justify-content:center;
 gap:12px;
 }
 
