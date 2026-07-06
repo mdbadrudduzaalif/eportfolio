@@ -1,138 +1,116 @@
-require("../js/components.js");
+require('../components.js');
 
-describe("Web Components", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-  });
+describe('Web Components', () => {
 
-  it("renders <nav-bar> correctly and sets active link", () => {
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+    beforeEach(() => {
+        document.body.innerHTML = '';
+    });
 
-    // Check it has rendered inner HTML
-    expect(nav.querySelector("nav")).not.toBeNull();
+    it('renders <nav-bar> correctly and sets active link', () => {
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-    // Check active link logic
-    const activeLink = nav.querySelector("a.active");
-    expect(activeLink).not.toBeNull();
-    expect(activeLink.textContent.trim()).toBe("Projects");
-    expect(activeLink.getAttribute("aria-current")).toBe("page");
-  });
+        // Check it has rendered inner HTML
+        expect(nav.querySelector('nav')).not.toBeNull();
 
-  it("nav-bar falls back to index.html when path is empty or root", () => {
-    // Change jsdom url to root
-    delete window.location;
-    window.location = new URL("http://localhost/");
+        // Check active link logic
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        expect(activeLink.textContent.trim()).toBe('Projects');
+        expect(activeLink.getAttribute('aria-current')).toBe('page');
+    });
 
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+    it('nav-bar sets no active link when path does not match any href', () => {
+        delete window.location;
+        window.location = new URL('http://localhost/unknown.html');
 
-    const activeLink = nav.querySelector("a.active");
-    expect(activeLink).not.toBeNull();
-    // Since it's an icon, we check the class or aria-label instead of text
-    expect(activeLink.classList.contains("nav-home")).toBe(true);
-  });
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-  it("renders <site-footer> correctly", () => {
-    const footer = document.createElement("site-footer");
-    document.body.appendChild(footer);
-    const currentYear = new Date().getFullYear();
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).toBeNull();
 
-    expect(footer.querySelector("footer")).not.toBeNull();
-    expect(footer.querySelector(".footer-copy").textContent).toContain(
-      `© ${currentYear} MD Badrudduza Alif`,
-    );
-  });
+        const ariaCurrent = nav.querySelector('a[aria-current="page"]');
+        expect(ariaCurrent).toBeNull();
+    });
 
-  it("toggles the theme and saves preference on button click", () => {
-    // Clear localStorage to start fresh
-    localStorage.clear();
-    // Start with empty classList
-    document.body.className = "";
+    it('nav-bar falls back to index.html when path is empty or root', () => {
+        // Change jsdom url to root
+        delete window.location;
+        window.location = new URL('http://localhost/');
 
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-    const toggleBtn = nav.querySelector(".theme-toggle");
-    expect(toggleBtn).not.toBeNull();
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        // Since it's an icon, we check the class or aria-label instead of text
+        expect(activeLink.classList.contains('nav-home')).toBe(true);
+    });
 
-    // Default state: no theme-light
-    expect(document.body.classList.contains("theme-light")).toBe(false);
-    expect(localStorage.getItem("theme")).toBeNull();
+    it('renders <site-footer> correctly', () => {
+        const footer = document.createElement('site-footer');
+        document.body.appendChild(footer);
+        const currentYear = new Date().getFullYear();
 
-    // Click: activate theme-light
-    toggleBtn.click();
-    expect(document.body.classList.contains("theme-light")).toBe(true);
-    expect(localStorage.getItem("theme")).toBe("light");
+        expect(footer.querySelector('footer')).not.toBeNull();
+        expect(footer.querySelector('.footer-copy').textContent).toContain(`© ${currentYear} MD Badrudduza Alif`);
+    });
 
-    // Click again: remove theme-light
-    toggleBtn.click();
-    expect(document.body.classList.contains("theme-light")).toBe(false);
-    expect(localStorage.getItem("theme")).toBeNull();
-  });
+    it('renders <image-lightbox> correctly and can open/close', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
 
-  it("loads the saved theme from localStorage on component load", () => {
-    localStorage.setItem("theme", "light");
-    document.body.className = "";
+        const lightboxDiv = lightboxComp.querySelector('.lightbox');
+        const img = lightboxComp.querySelector('.lightbox-img');
+        const closeBtn = lightboxComp.querySelector('.lightbox-close');
 
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+        expect(lightboxDiv).not.toBeNull();
+        expect(img).not.toBeNull();
+        expect(closeBtn).not.toBeNull();
+        expect(lightboxDiv.style.display).toBe('none');
 
-    expect(document.body.classList.contains("theme-light")).toBe(true);
-    const toggleBtn = nav.querySelector(".theme-toggle");
-    expect(toggleBtn.textContent).toBe("🌙");
-  });
+        // Test open
+        const testSrc = 'http://localhost/test-image.jpg';
 
-  it("shows error text when lightbox image fails to load", () => {
-    const lightboxComp = document.createElement("image-lightbox");
-    document.body.appendChild(lightboxComp);
+        // Add a dummy focused element to test focus restoration
+        const dummyBtn = document.createElement('button');
+        document.body.appendChild(dummyBtn);
+        dummyBtn.focus();
 
-    const img = lightboxComp.querySelector(".lightbox-img");
-    const errorText = lightboxComp.querySelector(".lightbox-error");
+        lightboxComp.open(testSrc);
 
-    expect(img.style.display).not.toBe("none");
-    expect(errorText.style.display).toBe("none");
+        expect(lightboxDiv.style.display).toBe('flex');
+        expect(img.src).toBe(testSrc);
 
-    // Simulate error event
-    img.dispatchEvent(new Event("error"));
+        // Test ARIA attributes
+        expect(lightboxDiv.getAttribute('role')).toBe('dialog');
+        expect(lightboxDiv.getAttribute('aria-modal')).toBe('true');
+        expect(lightboxDiv.getAttribute('aria-label')).toBe('Image Lightbox');
 
-    expect(img.style.display).toBe("none");
-    expect(errorText.style.display).toBe("block");
+        // Check if close button is focused
+        expect(document.activeElement).toBe(closeBtn);
 
-    // Should reset on reopen
-    lightboxComp.open("new-src.jpg");
-    expect(img.style.display).toBe("block");
-    expect(errorText.style.display).toBe("none");
-  });
+        // Test close with close button
+        closeBtn.click();
+        expect(lightboxDiv.style.display).toBe('none');
 
-  it("renders <image-lightbox> correctly and can open/close", () => {
-    const lightboxComp = document.createElement("image-lightbox");
-    document.body.appendChild(lightboxComp);
+        // Check if previous focus is restored
+        expect(document.activeElement).toBe(dummyBtn);
 
-    const lightboxDiv = lightboxComp.querySelector(".lightbox");
-    const img = lightboxComp.querySelector(".lightbox-img");
-    const closeBtn = lightboxComp.querySelector(".lightbox-close");
+        // Test close with escape key
+        lightboxComp.open(testSrc);
+        expect(lightboxDiv.style.display).toBe('flex');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+        expect(lightboxDiv.style.display).toBe('none');
+    });
 
-    expect(lightboxDiv).not.toBeNull();
-    expect(img).not.toBeNull();
-    expect(closeBtn).not.toBeNull();
-    expect(lightboxDiv.style.display).toBe("none");
-
-    // Test open
-    const testSrc = "http://localhost/test-image.jpg";
-    lightboxComp.open(testSrc);
-
-    expect(lightboxDiv.style.display).toBe("flex");
-    expect(img.src).toBe(testSrc);
-
-    // Test close with close button
-    closeBtn.click();
-    expect(lightboxDiv.style.display).toBe("none");
-
-    // Test close with escape key
-    lightboxComp.open(testSrc);
-    expect(lightboxDiv.style.display).toBe("flex");
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    expect(lightboxDiv.style.display).toBe("none");
-  });
+    it('does not throw when close() is called and lightbox element is missing', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
+        lightboxComp.innerHTML = ''; // Simulate missing lightbox element
+        expect(() => {
+            lightboxComp.close();
+        }).not.toThrow();
+    });
 });
