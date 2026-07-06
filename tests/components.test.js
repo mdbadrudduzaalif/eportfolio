@@ -48,6 +48,20 @@ describe('Web Components', () => {
         expect(activeLink.classList.contains('nav-home')).toBe(true);
     });
 
+    it('nav-bar correctly identifies active link when query parameters or hashes are present', () => {
+        // Mock a URL with a query parameter and hash
+        delete window.location;
+        window.location = new URL('http://localhost/projects.html?sort=desc#main');
+
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
+
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        expect(activeLink.textContent.trim()).toBe('Projects');
+        expect(activeLink.getAttribute('aria-current')).toBe('page');
+    });
+
     it('renders <site-footer> correctly', () => {
         const footer = document.createElement('site-footer');
         document.body.appendChild(footer);
@@ -69,6 +83,7 @@ describe('Web Components', () => {
         expect(img).not.toBeNull();
         expect(closeBtn).not.toBeNull();
         expect(lightboxDiv.style.display).toBe('none');
+        expect(lightboxDiv.getAttribute('aria-hidden')).toBe('true');
 
         // Test open
         const testSrc = 'http://localhost/test-image.jpg';
@@ -82,6 +97,7 @@ describe('Web Components', () => {
 
         expect(lightboxDiv.style.display).toBe('flex');
         expect(img.src).toBe(testSrc);
+        expect(lightboxDiv.getAttribute('aria-hidden')).toBe('false');
 
         // Test ARIA attributes
         expect(lightboxDiv.getAttribute('role')).toBe('dialog');
@@ -94,6 +110,7 @@ describe('Web Components', () => {
         // Test close with close button
         closeBtn.click();
         expect(lightboxDiv.style.display).toBe('none');
+        expect(lightboxDiv.getAttribute('aria-hidden')).toBe('true');
 
         // Check if previous focus is restored
         expect(document.activeElement).toBe(dummyBtn);
