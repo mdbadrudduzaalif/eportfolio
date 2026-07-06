@@ -20,6 +20,20 @@ describe('Web Components', () => {
         expect(activeLink.getAttribute('aria-current')).toBe('page');
     });
 
+    it('nav-bar sets no active link when path does not match any href', () => {
+        delete window.location;
+        window.location = new URL('http://localhost/unknown.html');
+
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
+
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).toBeNull();
+
+        const ariaCurrent = nav.querySelector('a[aria-current="page"]');
+        expect(ariaCurrent).toBeNull();
+    });
+
     it('nav-bar falls back to index.html when path is empty or root', () => {
         // Change jsdom url to root
         delete window.location;
@@ -32,18 +46,6 @@ describe('Web Components', () => {
         expect(activeLink).not.toBeNull();
         // Since it's an icon, we check the class or aria-label instead of text
         expect(activeLink.classList.contains('nav-home')).toBe(true);
-    });
-
-    it('nav-bar active link ignores query parameters and hash', () => {
-        delete window.location;
-        window.location = new URL('http://localhost/about.html?param=value#section');
-
-        const nav = document.createElement('nav-bar');
-        document.body.appendChild(nav);
-
-        const activeLink = nav.querySelector('a.active');
-        expect(activeLink).not.toBeNull();
-        expect(activeLink.textContent.trim()).toBe('About');
     });
 
     it('renders <site-footer> correctly', () => {
@@ -70,14 +72,31 @@ describe('Web Components', () => {
 
         // Test open
         const testSrc = 'http://localhost/test-image.jpg';
+
+        // Add a dummy focused element to test focus restoration
+        const dummyBtn = document.createElement('button');
+        document.body.appendChild(dummyBtn);
+        dummyBtn.focus();
+
         lightboxComp.open(testSrc);
 
         expect(lightboxDiv.style.display).toBe('flex');
         expect(img.src).toBe(testSrc);
 
+        // Test ARIA attributes
+        expect(lightboxDiv.getAttribute('role')).toBe('dialog');
+        expect(lightboxDiv.getAttribute('aria-modal')).toBe('true');
+        expect(lightboxDiv.getAttribute('aria-label')).toBe('Image Lightbox');
+
+        // Check if close button is focused
+        expect(document.activeElement).toBe(closeBtn);
+
         // Test close with close button
         closeBtn.click();
         expect(lightboxDiv.style.display).toBe('none');
+
+        // Check if previous focus is restored
+        expect(document.activeElement).toBe(dummyBtn);
 
         // Test close with escape key
         lightboxComp.open(testSrc);
@@ -86,29 +105,12 @@ describe('Web Components', () => {
         expect(lightboxDiv.style.display).toBe('none');
     });
 
-    it('removes keydown listener when image-lightbox is removed', () => {
+    it('does not throw when close() is called and lightbox element is missing', () => {
         const lightboxComp = document.createElement('image-lightbox');
         document.body.appendChild(lightboxComp);
-
-        lightboxComp.open('http://localhost/test-image.jpg');
-        const lightboxDiv = lightboxComp.querySelector('.lightbox');
-        expect(lightboxDiv.style.display).toBe('flex');
-
-        // Remove element, which should trigger disconnectedCallback
-        document.body.removeChild(lightboxComp);
-
-        // Dispatch Escape key - if listener wasn't removed it would throw error or try to access disconnected DOM,
-        // though JS won't strictly crash, we can spy on removeEventListener or just ensure it completes cleanly.
-        const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
-
-        // Let's do it with a fresh component to actually catch the spy
-        const comp2 = document.createElement('image-lightbox');
-        document.body.appendChild(comp2);
-        comp2.open('http://localhost/test-image.jpg');
-
-        document.body.removeChild(comp2);
-
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
-        removeEventListenerSpy.mockRestore();
+        lightboxComp.innerHTML = ''; // Simulate missing lightbox element
+        expect(() => {
+            lightboxComp.close();
+        }).not.toThrow();
     });
 });

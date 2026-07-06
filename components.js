@@ -1,7 +1,9 @@
+'use strict';
+
 class NavBar extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-<nav aria-label="Main Navigation">
+<nav>
 <a href="index.html" class="nav-home" aria-label="Home">
 <svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
 <path d="M3 10.5L12 3l9 7.5"></path>
@@ -19,10 +21,15 @@ class NavBar extends HTMLElement {
 </nav>
         `;
 
-        const path = window.location.pathname;
-        let page = path.split("/").pop().split('?')[0].split('#')[0];
-        if (!page) {
-            page = "index.html";
+        let page = "index.html";
+        try {
+            const path = new URL(window.location.href).pathname;
+            const parsedPage = path.split("/").pop();
+            if (parsedPage) {
+                page = parsedPage;
+            }
+        } catch (e) {
+            // Fallback for invalid URLs if any, though location.href is typically valid
         }
 
         const links = this.querySelectorAll('a');
@@ -43,7 +50,7 @@ customElements.define('nav-bar', NavBar);
 class ImageLightbox extends HTMLElement {
     connectedCallback() {
         this.innerHTML = `
-<div class="lightbox" style="display: none;">
+<div class="lightbox" style="display: none;" role="dialog" aria-modal="true" aria-label="Image Lightbox">
 <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 </div>
@@ -66,10 +73,16 @@ class ImageLightbox extends HTMLElement {
     open(src) {
         const lightbox = this.querySelector('.lightbox');
         const img = this.querySelector('.lightbox-img');
+        const closeBtn = this.querySelector('.lightbox-close');
+
         if (lightbox && img) {
+            this._previousFocus = document.activeElement;
             img.src = src;
             lightbox.style.display = 'flex';
             document.addEventListener('keydown', this._handleKeyDown);
+            if (closeBtn) {
+                closeBtn.focus();
+            }
         }
     }
 
@@ -78,12 +91,10 @@ class ImageLightbox extends HTMLElement {
         if (lightbox) {
             lightbox.style.display = 'none';
             document.removeEventListener('keydown', this._handleKeyDown);
-        }
-    }
-
-    disconnectedCallback() {
-        if (this._handleKeyDown) {
-            document.removeEventListener('keydown', this._handleKeyDown);
+            if (this._previousFocus) {
+                this._previousFocus.focus();
+                this._previousFocus = null;
+            }
         }
     }
 }
