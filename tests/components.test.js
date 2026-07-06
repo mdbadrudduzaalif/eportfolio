@@ -1,94 +1,116 @@
-require("../components.js");
+require('../components.js');
 
-describe("Web Components", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-  });
+describe('Web Components', () => {
 
-  it("renders <nav-bar> correctly and sets active link", () => {
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+    beforeEach(() => {
+        document.body.innerHTML = '';
+    });
 
-    // Check it has rendered inner HTML
-    expect(nav.querySelector("nav")).not.toBeNull();
+    it('renders <nav-bar> correctly and sets active link', () => {
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-    // Check active link logic
-    const activeLink = nav.querySelector("a.active");
-    expect(activeLink).not.toBeNull();
-    expect(activeLink.textContent.trim()).toBe("Projects");
-    expect(activeLink.getAttribute("aria-current")).toBe("page");
-  });
+        // Check it has rendered inner HTML
+        expect(nav.querySelector('nav')).not.toBeNull();
 
-  it("nav-bar falls back to index.html when path is empty or root", () => {
-    // Change jsdom url to root
-    delete window.location;
-    window.location = new URL("http://localhost/");
+        // Check active link logic
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        expect(activeLink.textContent.trim()).toBe('Projects');
+        expect(activeLink.getAttribute('aria-current')).toBe('page');
+    });
 
-    const nav = document.createElement("nav-bar");
-    document.body.appendChild(nav);
+    it('nav-bar sets no active link when path does not match any href', () => {
+        delete window.location;
+        window.location = new URL('http://localhost/unknown.html');
 
-    const activeLink = nav.querySelector("a.active");
-    expect(activeLink).not.toBeNull();
-    // Since it's an icon, we check the class or aria-label instead of text
-    expect(activeLink.classList.contains("nav-home")).toBe(true);
-  });
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-  it("renders <site-footer> correctly", () => {
-    const footer = document.createElement("site-footer");
-    document.body.appendChild(footer);
-    const currentYear = new Date().getFullYear();
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).toBeNull();
 
-    expect(footer.querySelector("footer")).not.toBeNull();
-    expect(footer.querySelector(".footer-copy").textContent).toContain(
-      `© ${currentYear} MD Badrudduza Alif`,
-    );
-  });
+        const ariaCurrent = nav.querySelector('a[aria-current="page"]');
+        expect(ariaCurrent).toBeNull();
+    });
 
-  it("renders <image-lightbox> correctly and can open/close", () => {
-    const lightboxComp = document.createElement("image-lightbox");
-    document.body.appendChild(lightboxComp);
+    it('nav-bar falls back to index.html when path is empty or root', () => {
+        // Change jsdom url to root
+        delete window.location;
+        window.location = new URL('http://localhost/');
 
-    const lightboxDiv = lightboxComp.querySelector(".lightbox");
-    const img = lightboxComp.querySelector(".lightbox-img");
-    const closeBtn = lightboxComp.querySelector(".lightbox-close");
+        const nav = document.createElement('nav-bar');
+        document.body.appendChild(nav);
 
-    expect(lightboxDiv).not.toBeNull();
-    expect(img).not.toBeNull();
-    expect(closeBtn).not.toBeNull();
-    expect(lightboxDiv.style.display).toBe("none");
+        const activeLink = nav.querySelector('a.active');
+        expect(activeLink).not.toBeNull();
+        // Since it's an icon, we check the class or aria-label instead of text
+        expect(activeLink.classList.contains('nav-home')).toBe(true);
+    });
 
-    // Test open
-    const testSrc = "http://localhost/test-image.jpg";
+    it('renders <site-footer> correctly', () => {
+        const footer = document.createElement('site-footer');
+        document.body.appendChild(footer);
+        const currentYear = new Date().getFullYear();
 
-    // Add a dummy focused element to test focus restoration
-    const dummyBtn = document.createElement("button");
-    document.body.appendChild(dummyBtn);
-    dummyBtn.focus();
+        expect(footer.querySelector('footer')).not.toBeNull();
+        expect(footer.querySelector('.footer-copy').textContent).toContain(`© ${currentYear} MD Badrudduza Alif`);
+    });
 
-    lightboxComp.open(testSrc);
+    it('renders <image-lightbox> correctly and can open/close', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
 
-    expect(lightboxDiv.style.display).toBe("flex");
-    expect(img.src).toBe(testSrc);
+        const lightboxDiv = lightboxComp.querySelector('.lightbox');
+        const img = lightboxComp.querySelector('.lightbox-img');
+        const closeBtn = lightboxComp.querySelector('.lightbox-close');
 
-    // Test ARIA attributes
-    expect(lightboxDiv.getAttribute("role")).toBe("dialog");
-    expect(lightboxDiv.getAttribute("aria-modal")).toBe("true");
-    expect(lightboxDiv.getAttribute("aria-label")).toBe("Image Lightbox");
+        expect(lightboxDiv).not.toBeNull();
+        expect(img).not.toBeNull();
+        expect(closeBtn).not.toBeNull();
+        expect(lightboxDiv.style.display).toBe('none');
 
-    // Check if close button is focused
-    expect(document.activeElement).toBe(closeBtn);
+        // Test open
+        const testSrc = 'http://localhost/test-image.jpg';
 
-    // Test close with close button
-    closeBtn.click();
-    expect(lightboxDiv.style.display).toBe("none");
+        // Add a dummy focused element to test focus restoration
+        const dummyBtn = document.createElement('button');
+        document.body.appendChild(dummyBtn);
+        dummyBtn.focus();
 
-    // Check if previous focus is restored
-    expect(document.activeElement).toBe(dummyBtn);
+        lightboxComp.open(testSrc);
 
-    // Test close with escape key
-    lightboxComp.open(testSrc);
-    expect(lightboxDiv.style.display).toBe("flex");
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    expect(lightboxDiv.style.display).toBe("none");
-  });
+        expect(lightboxDiv.style.display).toBe('flex');
+        expect(img.src).toBe(testSrc);
+
+        // Test ARIA attributes
+        expect(lightboxDiv.getAttribute('role')).toBe('dialog');
+        expect(lightboxDiv.getAttribute('aria-modal')).toBe('true');
+        expect(lightboxDiv.getAttribute('aria-label')).toBe('Image Lightbox');
+
+        // Check if close button is focused
+        expect(document.activeElement).toBe(closeBtn);
+
+        // Test close with close button
+        closeBtn.click();
+        expect(lightboxDiv.style.display).toBe('none');
+
+        // Check if previous focus is restored
+        expect(document.activeElement).toBe(dummyBtn);
+
+        // Test close with escape key
+        lightboxComp.open(testSrc);
+        expect(lightboxDiv.style.display).toBe('flex');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+        expect(lightboxDiv.style.display).toBe('none');
+    });
+
+    it('does not throw when close() is called and lightbox element is missing', () => {
+        const lightboxComp = document.createElement('image-lightbox');
+        document.body.appendChild(lightboxComp);
+        lightboxComp.innerHTML = ''; // Simulate missing lightbox element
+        expect(() => {
+            lightboxComp.close();
+        }).not.toThrow();
+    });
 });
