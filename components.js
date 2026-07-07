@@ -85,6 +85,7 @@ class ImageLightbox extends HTMLElement {
         const lightbox = document.createElement('div');
         lightbox.className = 'lightbox';
         lightbox.style.display = 'none';
+        lightbox.setAttribute('aria-hidden', 'true');
         lightbox.setAttribute('role', 'dialog');
         lightbox.setAttribute('aria-modal', 'true');
         lightbox.setAttribute('aria-label', 'Image Lightbox');
@@ -125,6 +126,7 @@ class ImageLightbox extends HTMLElement {
             this._previousFocus = document.activeElement;
             img.src = src;
             lightbox.style.display = 'flex';
+            lightbox.setAttribute('aria-hidden', 'false');
             document.addEventListener('keydown', this._handleKeyDown);
             if (closeBtn) {
                 closeBtn.focus();
@@ -136,6 +138,7 @@ class ImageLightbox extends HTMLElement {
         const lightbox = this.querySelector('.lightbox');
         if (lightbox) {
             lightbox.style.display = 'none';
+            lightbox.setAttribute('aria-hidden', 'true');
             document.removeEventListener('keydown', this._handleKeyDown);
             if (this._previousFocus) {
                 this._previousFocus.focus();
