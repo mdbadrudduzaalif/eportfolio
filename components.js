@@ -34,6 +34,8 @@ class NavBar extends HTMLElement {
         const navLinks = document.createElement('div');
         navLinks.className = 'nav-links';
 
+        const createdLinks = [homeLink];
+
         const linksData = [
             { href: 'projects.html', text: 'Projects' },
             { href: 'about.html', text: 'About' },
@@ -47,6 +49,7 @@ class NavBar extends HTMLElement {
             a.href = data.href;
             a.textContent = data.text;
             navLinks.appendChild(a);
+            createdLinks.push(a);
         });
 
         nav.appendChild(navLinks);
@@ -63,8 +66,7 @@ class NavBar extends HTMLElement {
             // Fallback for invalid URLs if any, though location.href is typically valid
         }
 
-        const links = this.querySelectorAll('a');
-        links.forEach(link => {
+        createdLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (href === page) {
                 link.classList.add('active');
