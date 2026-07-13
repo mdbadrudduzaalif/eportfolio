@@ -64,7 +64,7 @@ customElements.define("nav-bar", NavBar);
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-<div class="lightbox" style="display: none;">
+<div class="lightbox" style="display: none;" role="dialog" aria-modal="true" aria-label="Image Lightbox" aria-hidden="true">
 <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 <p class="lightbox-error" style="display:none; color:white;">Image failed to load</p>
@@ -103,11 +103,15 @@ class ImageLightbox extends HTMLElement {
     const img = this.querySelector(".lightbox-img");
     const errorText = this.querySelector(".lightbox-error");
     if (lightbox && img) {
+      this._previousFocus = document.activeElement;
       img.src = src;
       img.style.display = "block";
       if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
+      lightbox.setAttribute("aria-hidden", "false");
       document.addEventListener("keydown", this._handleKeyDown);
+      const closeBtn = this.querySelector(".lightbox-close");
+      if (closeBtn) closeBtn.focus();
     }
   }
 
@@ -115,7 +119,12 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     if (lightbox) {
       lightbox.style.display = "none";
+      lightbox.setAttribute("aria-hidden", "true");
       document.removeEventListener("keydown", this._handleKeyDown);
+      if (this._previousFocus) {
+        this._previousFocus.focus();
+        this._previousFocus = null;
+      }
     }
   }
 }
