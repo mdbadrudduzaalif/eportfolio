@@ -1,135 +1,153 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="description" content="Portfolio of MD Badrudduza Alif" />
+    <meta name="theme-color" content="#0f172a" />
 
-<head>
+    <title>MD Badrudduza Alif | Portfolio</title>
+    <meta name="theme-color" content="#0f172a" />
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#0f172a">
-<meta name="description" content="Portfolio of MD Badrudduza Alif">
-<meta name="theme-color" content="#0f172a">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
 
-<title>MD Badrudduza Alif | Portfolio</title>
-<meta name="theme-color" content="#0f172a">
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
+    <!-- NAVBAR -->
 
-<link rel="stylesheet" href="style.css">
-</head>
+    <nav-bar></nav-bar>
 
-<body>
+    <main id="main-content" class="page home">
+      <!-- HERO -->
 
-<!-- NAVBAR -->
+      <header>
+        <img
+          src="profile.jpg"
+          class="profile-photo"
+          alt="Profile photo of MD Badrudduza Alif"
+          fetchpriority="high"
+        />
 
-<nav-bar></nav-bar>
+        <div>
+          <h1>MD Badrudduza Alif</h1>
 
-<main class="page home">
+          <div class="subtitle">
+            Aspiring AI Engineer | C++ & Java Developer | Dhaka, Bangladesh
+          </div>
+        </div>
+      </header>
 
-<!-- HERO -->
+      <!-- ABOUT -->
 
-<header>
+      <section class="card">
+        <h2>About Me</h2>
 
-<img src="profile.jpg" class="profile-photo" alt="Profile photo of MD Badrudduza Alif" fetchpriority="high">
+        <p>
+          I am currently pursuing a Bachelor of Science in Computer Science and
+          Engineering (CSE). My interests include software development, system
+          design, and emerging technologies such as artificial intelligence and
+          automation systems.
+        </p>
 
-<div>
+        <p>
+          My programming background includes C++ and Java, and I regularly
+          maintain and update my GitHub repositories while working on small
+          development projects and web-based applications.
+        </p>
+      </section>
 
-<h1>MD Badrudduza Alif</h1>
+      <!-- ACHIEVEMENTS -->
 
-<div class="subtitle">
-Aspiring AI Engineer | C++ & Java Developer | Dhaka, Bangladesh
-</div>
+      <section class="card">
+        <h2>Achievements</h2>
 
-</div>
+        <p>
+          1st Runners-Up — AUST Oscillon Ad Making Contest. Collaborated in a
+          team-based creative project where we planned, developed, and presented
+          an advertisement concept.
+        </p>
 
-</header>
+        <img
+          src="aust-oscillon.jpg"
+          class="project-img"
+          alt="AUST Oscillon Ad Making Contest"
+          loading="lazy"
+          data-lightbox
+        />
 
-<!-- ABOUT -->
+        <p>
+          <b>Location:</b> Ahsanullah University of Science and Technology
+          (AUST), Dhaka
+        </p>
+      </section>
 
-<section class="card">
+      <!-- VIDEO CV -->
 
-<h2>About Me</h2>
+      <section class="card video-section">
+        <div class="video-text">
+          <h2>Video CV</h2>
 
-<p>
-I am currently pursuing a Bachelor of Science in Computer Science and Engineering (CSE). 
-My interests include software development, system design, and emerging technologies 
-such as artificial intelligence and automation systems.
-</p>
+          <p>
+            This short video introduces my academic background, programming
+            experience, and career interests in software development and
+            artificial intelligence.
+          </p>
 
-<p>
-My programming background includes C++ and Java, and I regularly maintain and update 
-my GitHub repositories while working on small development projects and web-based applications.
-</p>
+          <p>
+            In this video I briefly discuss my education, technical skills, and
+            the projects I have worked on while developing my programming
+            foundation.
+          </p>
+        </div>
 
-</section>
+        <div class="video-player">
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/-4sTsMjOmxY?rel=0&modestbranding=1"
+            title="Video CV"
+            allow="
+              accelerometer;
+              autoplay;
+              clipboard-write;
+              encrypted-media;
+              gyroscope;
+              picture-in-picture;
+              web-share;
+            "
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          >
+          </iframe>
 
-<!-- ACHIEVEMENTS -->
+          <p class="video-fallback">
+            If playback is blocked,
+            <a
+              href="https://www.youtube.com/watch?v=-4sTsMjOmxY"
+              target="_blank"
+              rel="noopener noreferrer"
+              >watch on YouTube</a
+            >.
+          </p>
+        </div>
+      </section>
 
-<section class="card">
+      <!-- FOOTER -->
 
-<h2>Achievements</h2>
+      <site-footer></site-footer>
+    </main>
 
-<p>
-1st Runners-Up — AUST Oscillon Ad Making Contest. Collaborated in a team-based 
-creative project where we planned, developed, and presented an advertisement concept.
-</p>
+    <!-- LIGHTBOX dynamically injected -->
 
-<img src="aust-oscillon.jpg" class="project-img" alt="AUST Oscillon Ad Making Contest" loading="lazy" data-lightbox>
-
-<p><b>Location:</b> Ahsanullah University of Science and Technology (AUST), Dhaka</p>
-
-</section>
-
-<!-- VIDEO CV -->
-
-<section class="card video-section">
-
-<div class="video-text">
-
-<h2>Video CV</h2>
-
-<p>
-This short video introduces my academic background, programming experience,
-and career interests in software development and artificial intelligence.
-</p>
-
-<p>
-In this video I briefly discuss my education, technical skills, and the
-projects I have worked on while developing my programming foundation.
-</p>
-
-</div>
-
-<div class="video-player">
-
-<iframe
-src="https://www.youtube-nocookie.com/embed/-4sTsMjOmxY?rel=0&modestbranding=1"
-title="Video CV"
-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-loading="lazy"
-referrerpolicy="strict-origin-when-cross-origin"
-allowfullscreen>
-</iframe>
-
-<p class="video-fallback">
-If playback is blocked, <a href="https://www.youtube.com/watch?v=-4sTsMjOmxY" target="_blank" rel="noopener noreferrer">watch on YouTube</a>.
-</p>
-
-</div>
-
-</section>
-  
-
-<!-- FOOTER -->
-
-<site-footer></site-footer>
-
-</main>
-
-<!-- LIGHTBOX dynamically injected -->
-
-<script src="components.js" defer></script>
-</body>
+    <script src="components.js" defer></script>
+  </body>
 </html>
