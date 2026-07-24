@@ -1,29 +1,79 @@
+"use strict";
+
 class NavBar extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
-<nav>
-<a href="index.html" class="nav-home" aria-label="Home">
-<svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M3 10.5L12 3l9 7.5"></path>
-<path d="M5 9.5V21h14V9.5"></path>
-<path d="M10 21v-6h4v6"></path>
-</svg>
-</a>
-<div class="nav-links">
-<a href="projects.html">Projects</a>
-<a href="about.html">About</a>
-<a href="education.html">Education</a>
-<a href="resume.html">Resume</a>
-<a href="contact.html">Contact</a>
-        <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
-</div>
-</nav>
-        `;
+    if (this.hasChildNodes()) this.replaceChildren();
 
-    const path = window.location.pathname;
-    let page = path.split("/").pop();
-    if (!page) {
-      page = "index.html";
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    document.body.prepend(skipLink);
+
+    const nav = document.createElement("nav");
+
+    const homeLink = document.createElement("a");
+    homeLink.href = "index.html";
+    homeLink.className = "nav-home";
+    homeLink.setAttribute("aria-label", "Home");
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path1 = document.createElementNS(svgNS, "path");
+    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS(svgNS, "path");
+    path2.setAttribute("d", "M5 9.5V21h14V9.5");
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS(svgNS, "path");
+    path3.setAttribute("d", "M10 21v-6h4v6");
+    svg.appendChild(path3);
+
+    homeLink.appendChild(svg);
+    nav.appendChild(homeLink);
+
+    const navLinks = document.createElement("div");
+    navLinks.className = "nav-links";
+
+    const linksData = [
+      { href: "projects.html", text: "Projects" },
+      { href: "about.html", text: "About" },
+      { href: "education.html", text: "Education" },
+      { href: "resume.html", text: "Resume" },
+      { href: "contact.html", text: "Contact" },
+    ];
+
+    linksData.forEach((data) => {
+      const a = document.createElement("a");
+      a.href = data.href;
+      a.textContent = data.text;
+      navLinks.appendChild(a);
+    });
+
+    const themeToggleBtn = document.createElement("button");
+    themeToggleBtn.className = "theme-toggle";
+    themeToggleBtn.setAttribute("aria-label", "Toggle theme");
+    themeToggleBtn.textContent = "☀️";
+    navLinks.appendChild(themeToggleBtn);
+
+    nav.appendChild(navLinks);
+    this.appendChild(nav);
+
+    let page = "index.html";
+    try {
+      const path = new URL(window.location.href).pathname;
+      const parsedPage = path.split("/").pop();
+      if (parsedPage) {
+        page = parsedPage;
+      }
+    } catch (e) {
+      // Fallback for jsdom/invalid URLs
     }
 
     const links = this.querySelectorAll("a");
@@ -38,7 +88,6 @@ class NavBar extends HTMLElement {
       }
     });
 
-    const themeToggleBtn = this.querySelector(".theme-toggle");
     if (themeToggleBtn) {
       themeToggleBtn.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
@@ -63,23 +112,40 @@ customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
-<div class="lightbox" style="display: none;">
-<button class="lightbox-close" aria-label="Close lightbox">&times;</button>
-<img class="lightbox-img" alt="Enlarged view">
-<p class="lightbox-error" style="display:none; color:white;">Image failed to load</p>
-</div>
-        `;
-    const lightbox = this.querySelector(".lightbox");
-    const img = this.querySelector(".lightbox-img");
-    const errorText = this.querySelector(".lightbox-error");
+    if (this.hasChildNodes()) this.replaceChildren();
 
-    if (img && errorText) {
-      img.addEventListener("error", () => {
-        img.style.display = "none";
-        errorText.style.display = "block";
-      });
-    }
+    const lightbox = document.createElement("div");
+    lightbox.className = "lightbox";
+    lightbox.style.display = "none";
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-label", "Image Lightbox");
+    lightbox.setAttribute("aria-hidden", "true");
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "lightbox-close";
+    closeBtn.setAttribute("aria-label", "Close lightbox");
+    closeBtn.textContent = "×";
+
+    const img = document.createElement("img");
+    img.className = "lightbox-img";
+    img.alt = "Enlarged view";
+
+    const errorText = document.createElement("p");
+    errorText.className = "lightbox-error";
+    errorText.style.display = "none";
+    errorText.style.color = "white";
+    errorText.textContent = "Image failed to load";
+
+    lightbox.appendChild(closeBtn);
+    lightbox.appendChild(img);
+    lightbox.appendChild(errorText);
+    this.appendChild(lightbox);
+
+    img.addEventListener("error", () => {
+      img.style.display = "none";
+      errorText.style.display = "block";
+    });
 
     lightbox.addEventListener("click", (e) => {
       if (
@@ -102,12 +168,19 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     const img = this.querySelector(".lightbox-img");
     const errorText = this.querySelector(".lightbox-error");
+    const closeBtn = this.querySelector(".lightbox-close");
+
     if (lightbox && img) {
+      this._previousFocus = document.activeElement;
       img.src = src;
       img.style.display = "block";
       if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
+      lightbox.setAttribute("aria-hidden", "false");
       document.addEventListener("keydown", this._handleKeyDown);
+      if (closeBtn) {
+        closeBtn.focus();
+      }
     }
   }
 
@@ -115,11 +188,99 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     if (lightbox) {
       lightbox.style.display = "none";
+      lightbox.setAttribute("aria-hidden", "true");
       document.removeEventListener("keydown", this._handleKeyDown);
+      if (this._previousFocus) {
+        this._previousFocus.focus();
+        this._previousFocus = null;
+      }
     }
   }
 }
 customElements.define("image-lightbox", ImageLightbox);
+
+class SiteFooter extends HTMLElement {
+  connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+    const currentYear = new Date().getFullYear();
+    const footer = document.createElement("footer");
+
+    const footerCopy = document.createElement("span");
+    footerCopy.className = "footer-copy";
+    footerCopy.textContent = `© ${currentYear} MD Badrudduza Alif. All rights reserved.`;
+
+    const footerLinks = document.createElement("span");
+    footerLinks.className = "footer-links";
+
+    const socialLinks = [
+      {
+        href: "https://github.com/mdbadrudduzaalif",
+        label: "GitHub",
+        img: "assets/images/github.png",
+      },
+      {
+        href: "https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/",
+        label: "LinkedIn",
+        img: "assets/images/linkedin.png",
+      },
+      {
+        href: "https://www.facebook.com/mdbadrudduza.alif",
+        label: "Facebook",
+        img: "assets/images/facebook.png",
+      },
+      {
+        href: "https://wa.me/8801704448723",
+        label: "WhatsApp",
+        img: "assets/images/whatsapp.png",
+      },
+    ];
+
+    socialLinks.forEach((link) => {
+      const a = document.createElement("a");
+      a.className =
+        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+      a.href = link.href;
+      a.setAttribute("aria-label", link.label);
+      a.title = link.label;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+
+      const img = document.createElement("img");
+      img.src = link.img;
+      img.className = "footer-icon";
+      img.alt = link.label;
+
+      a.appendChild(img);
+      footerLinks.appendChild(a);
+    });
+
+    footer.appendChild(footerCopy);
+    footer.appendChild(footerLinks);
+    this.appendChild(footer);
+  }
+}
+customElements.define("site-footer", SiteFooter);
+
+class SecureEmail extends HTMLElement {
+  connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+    const encodedEmail = this.getAttribute("data-email");
+    if (encodedEmail) {
+      try {
+        const email = atob(encodedEmail);
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
+      } catch (e) {
+        console.error("Failed to decode email", e);
+      }
+    }
+  }
+}
+customElements.define("secure-email", SecureEmail);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
@@ -129,32 +290,8 @@ document.addEventListener("click", (e) => {
       lightbox = document.createElement("image-lightbox");
       document.body.appendChild(lightbox);
     }
-    lightbox.open(e.target.src);
+    if (typeof lightbox.open === "function") {
+      lightbox.open(e.target.src);
+    }
   }
 });
-
-class SiteFooter extends HTMLElement {
-  connectedCallback() {
-    const currentYear = new Date().getFullYear();
-    this.innerHTML = `
-<footer>
-<span class="footer-copy">© ${currentYear} MD Badrudduza Alif. All rights reserved.</span>
-<span class="footer-links">
-<a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/github.png" class="footer-icon" alt="GitHub">
-</a>
-<a class="footer-link" href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/linkedin.png" class="footer-icon" alt="LinkedIn">
-</a>
-<a class="footer-link" href="https://www.facebook.com/mdbadrudduza.alif" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/facebook.png" class="footer-icon" alt="Facebook">
-</a>
-<a class="footer-link" href="https://wa.me/8801704448723" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/whatsapp.png" class="footer-icon" alt="WhatsApp">
-</a>
-</span>
-</footer>
-        `;
-  }
-}
-customElements.define("site-footer", SiteFooter);
