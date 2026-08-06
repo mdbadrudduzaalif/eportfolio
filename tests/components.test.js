@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 require("../components.js");
+=======
+require("../js/components.js");
+>>>>>>> origin/main
 
 describe("Web Components", () => {
   beforeEach(() => {
