@@ -555,3 +555,58 @@ button:focus-visible {
     aspect-ratio: 16/9;
   }
 }
+
+/* SKIP LINK */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--accent);
+  color: var(--nav-active-text);
+  padding: 8px;
+  z-index: 1001;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* LIGHT THEME */
+.theme-light {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --nav-bg: #ffffff;
+  --accent: #0284c7;
+  --card-bg: #ffffff;
+  --shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  --text-muted: #64748b;
+  --text-secondary: #475569;
+  --border-color: #cbd5e1;
+  --border-dark: #e2e8f0;
+  --nav-active-text: #ffffff;
+}
+
+.theme-light .github-link .footer-icon {
+  background: transparent;
+  filter: invert(1);
+}
+
+.theme-light .edu-image {
+  background: #f1f5f9;
+}
+
+.theme-light .edu-image:hover {
+  background: #e2e8f0;
+}
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  transition: transform 0.2s;
+}
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
