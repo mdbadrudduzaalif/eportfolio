@@ -1,5 +1,6 @@
 class NavBar extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     this.innerHTML = `
 <nav>
 <a href="index.html" class="nav-home" aria-label="Home">
@@ -63,8 +64,9 @@ customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     this.innerHTML = `
-<div class="lightbox" style="display: none;">
+<div class="lightbox" style="display: none;" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Image Lightbox">
 <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
 <img class="lightbox-img" alt="Enlarged view">
 <p class="lightbox-error" style="display:none; color:white;">Image failed to load</p>
@@ -102,12 +104,16 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     const img = this.querySelector(".lightbox-img");
     const errorText = this.querySelector(".lightbox-error");
+    const closeBtn = this.querySelector(".lightbox-close");
     if (lightbox && img) {
+      this.previousFocus = document.activeElement;
       img.src = src;
       img.style.display = "block";
       if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
+      lightbox.setAttribute("aria-hidden", "false");
       document.addEventListener("keydown", this._handleKeyDown);
+      if (closeBtn) closeBtn.focus();
     }
   }
 
@@ -115,7 +121,9 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     if (lightbox) {
       lightbox.style.display = "none";
+      lightbox.setAttribute("aria-hidden", "true");
       document.removeEventListener("keydown", this._handleKeyDown);
+      if (this.previousFocus) this.previousFocus.focus();
     }
   }
 }
@@ -135,6 +143,7 @@ document.addEventListener("click", (e) => {
 
 class SiteFooter extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
     this.innerHTML = `
 <footer>
@@ -158,3 +167,25 @@ class SiteFooter extends HTMLElement {
   }
 }
 customElements.define("site-footer", SiteFooter);
+
+class SecureEmail extends HTMLElement {
+  connectedCallback() {
+    const encodedEmail = this.getAttribute("data-email");
+    if (encodedEmail) {
+      try {
+        const email = atob(encodedEmail);
+        // Avoid innerHTML by using native DOM elements to prevent XSS
+        if (this.hasChildNodes()) this.replaceChildren();
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
+      } catch (e) {
+        console.error("Failed to decode email", e);
+      }
+    }
+  }
+}
+customElements.define("secure-email", SecureEmail);
