@@ -5,6 +5,12 @@ class NavBar extends HTMLElement {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
 
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    nav.appendChild(skipLink);
+
     const homeLink = document.createElement("a");
     homeLink.href = "index.html";
     homeLink.className = "nav-home";
@@ -49,6 +55,12 @@ class NavBar extends HTMLElement {
       navLinks.appendChild(a);
     });
 
+    const themeToggleBtn = document.createElement("button");
+    themeToggleBtn.className = "theme-toggle";
+    themeToggleBtn.setAttribute("aria-label", "Toggle theme");
+    themeToggleBtn.textContent = "☀️";
+    navLinks.appendChild(themeToggleBtn);
+
     nav.appendChild(navLinks);
     this.appendChild(nav);
 
@@ -74,8 +86,29 @@ class NavBar extends HTMLElement {
         link.removeAttribute("aria-current");
       }
     });
+
+    const themeToggleBtnRef = this.querySelector(".theme-toggle");
+    if (themeToggleBtnRef) {
+      themeToggleBtnRef.addEventListener("click", () => {
+        document.body.classList.toggle("theme-light");
+        if (document.body.classList.contains("theme-light")) {
+          localStorage.setItem("theme", "light");
+          themeToggleBtnRef.textContent = "🌙";
+        } else {
+          localStorage.removeItem("theme");
+          themeToggleBtnRef.textContent = "☀️";
+        }
+      });
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+        document.body.classList.add("theme-light");
+        themeToggleBtnRef.textContent = "🌙";
+      }
+    }
   }
 }
+
 customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
@@ -182,22 +215,22 @@ class SiteFooter extends HTMLElement {
       {
         href: "https://github.com/mdbadrudduzaalif",
         label: "GitHub",
-        img: "github.png",
+        img: "assets/images/github.png",
       },
       {
         href: "https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/",
         label: "LinkedIn",
-        img: "linkedin.png",
+        img: "assets/images/linkedin.png",
       },
       {
         href: "https://www.facebook.com/mdbadrudduza.alif",
         label: "Facebook",
-        img: "facebook.png",
+        img: "assets/images/facebook.png",
       },
       {
         href: "https://wa.me/8801704448723",
         label: "WhatsApp",
-        img: "whatsapp.png",
+        img: "assets/images/whatsapp.png",
       },
     ];
 
