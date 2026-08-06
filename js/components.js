@@ -55,6 +55,12 @@ class NavBar extends HTMLElement {
       navLinks.appendChild(a);
     });
 
+    const themeToggleBtn = document.createElement("button");
+    themeToggleBtn.className = "theme-toggle";
+    themeToggleBtn.setAttribute("aria-label", "Toggle theme");
+    themeToggleBtn.textContent = "☀️";
+    navLinks.appendChild(themeToggleBtn);
+
     nav.appendChild(navLinks);
     this.appendChild(nav);
 
@@ -69,29 +75,6 @@ class NavBar extends HTMLElement {
       // Fallback for invalid URLs if any, though location.href is typically valid
     }
 
-    const themeToggleBtn = document.createElement("button");
-    themeToggleBtn.className = "theme-toggle";
-    themeToggleBtn.setAttribute("aria-label", "Toggle theme");
-    themeToggleBtn.textContent = "☀️";
-
-    themeToggleBtn.addEventListener("click", () => {
-      document.body.classList.toggle("theme-light");
-      if (document.body.classList.contains("theme-light")) {
-        localStorage.setItem("theme", "light");
-        themeToggleBtn.textContent = "🌙";
-      } else {
-        localStorage.removeItem("theme");
-        themeToggleBtn.textContent = "☀️";
-      }
-    });
-
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "light") {
-      document.body.classList.add("theme-light");
-      themeToggleBtn.textContent = "🌙";
-    }
-    navLinks.appendChild(themeToggleBtn);
-
     const links = this.querySelectorAll("a");
     links.forEach((link) => {
       const href = link.getAttribute("href");
@@ -103,8 +86,29 @@ class NavBar extends HTMLElement {
         link.removeAttribute("aria-current");
       }
     });
+
+    const themeToggleBtnRef = this.querySelector(".theme-toggle");
+    if (themeToggleBtnRef) {
+      themeToggleBtnRef.addEventListener("click", () => {
+        document.body.classList.toggle("theme-light");
+        if (document.body.classList.contains("theme-light")) {
+          localStorage.setItem("theme", "light");
+          themeToggleBtnRef.textContent = "🌙";
+        } else {
+          localStorage.removeItem("theme");
+          themeToggleBtnRef.textContent = "☀️";
+        }
+      });
+
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "light") {
+        document.body.classList.add("theme-light");
+        themeToggleBtnRef.textContent = "🌙";
+      }
+    }
   }
 }
+
 customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
@@ -114,6 +118,7 @@ class ImageLightbox extends HTMLElement {
     const lightbox = document.createElement("div");
     lightbox.className = "lightbox";
     lightbox.style.display = "none";
+    lightbox.setAttribute("aria-hidden", "true");
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", "Image Lightbox");
@@ -128,20 +133,8 @@ class ImageLightbox extends HTMLElement {
     img.className = "lightbox-img";
     img.alt = "Enlarged view";
 
-    const errorText = document.createElement("p");
-    errorText.className = "lightbox-error";
-    errorText.style.display = "none";
-    errorText.style.color = "white";
-    errorText.textContent = "Image failed to load";
-
-    img.addEventListener("error", () => {
-      img.style.display = "none";
-      errorText.style.display = "block";
-    });
-
     lightbox.appendChild(closeBtn);
     lightbox.appendChild(img);
-    lightbox.appendChild(errorText);
     this.appendChild(lightbox);
 
     lightbox.addEventListener("click", (e) => {
@@ -166,13 +159,9 @@ class ImageLightbox extends HTMLElement {
     const img = this.querySelector(".lightbox-img");
     const closeBtn = this.querySelector(".lightbox-close");
 
-    const errorText = this.querySelector(".lightbox-error");
-
     if (lightbox && img) {
       this._previousFocus = document.activeElement;
       img.src = src;
-      img.style.display = "block";
-      if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
       lightbox.setAttribute("aria-hidden", "false");
       document.addEventListener("keydown", this._handleKeyDown);
@@ -273,17 +262,11 @@ customElements.define("site-footer", SiteFooter);
 
 class SecureEmail extends HTMLElement {
   connectedCallback() {
-    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        const a = document.createElement("a");
-        a.href = `mailto:${email}`;
-        a.style.color = "var(--accent)";
-        a.style.textDecoration = "none";
-        a.textContent = email;
-        this.appendChild(a);
+        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
       } catch (e) {
         console.error("Failed to decode email", e);
       }
