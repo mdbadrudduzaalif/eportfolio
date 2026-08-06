@@ -88,6 +88,21 @@ class NavBar extends HTMLElement {
     });
 
     const themeToggleBtnRef = this.querySelector(".theme-toggle");
+
+    const updateMetaThemeColor = () => {
+      let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (!metaThemeColor) {
+        metaThemeColor = document.createElement("meta");
+        metaThemeColor.name = "theme-color";
+        document.head.appendChild(metaThemeColor);
+      }
+      if (document.body.classList.contains("theme-light")) {
+        metaThemeColor.content = "#f8fafc";
+      } else {
+        metaThemeColor.content = "#0f172a";
+      }
+    };
+
     if (themeToggleBtnRef) {
       themeToggleBtnRef.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
@@ -98,6 +113,7 @@ class NavBar extends HTMLElement {
           localStorage.removeItem("theme");
           themeToggleBtnRef.textContent = "☀️";
         }
+        updateMetaThemeColor();
       });
 
       const savedTheme = localStorage.getItem("theme");
@@ -105,6 +121,8 @@ class NavBar extends HTMLElement {
         document.body.classList.add("theme-light");
         themeToggleBtnRef.textContent = "🌙";
       }
+      // Initialize meta theme color on load
+      updateMetaThemeColor();
     }
   }
 }
@@ -122,7 +140,6 @@ class ImageLightbox extends HTMLElement {
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", "Image Lightbox");
-    lightbox.setAttribute("aria-hidden", "true");
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "lightbox-close";
@@ -262,11 +279,17 @@ customElements.define("site-footer", SiteFooter);
 
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.setAttribute("style", "color: var(--accent); text-decoration: none;");
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }

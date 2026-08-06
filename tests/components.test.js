@@ -131,4 +131,42 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly and decodes email", () => {
+    const secureEmail = document.createElement("secure-email");
+    const testEmail = "test@example.com";
+    secureEmail.setAttribute("data-email", btoa(testEmail));
+    document.body.appendChild(secureEmail);
+
+    const link = secureEmail.querySelector("a");
+    expect(link).not.toBeNull();
+    expect(link.href).toBe(`mailto:${testEmail}`);
+    expect(link.textContent).toBe(testEmail);
+    expect(link.getAttribute("style")).toContain("color: var(--accent)");
+    expect(link.getAttribute("style")).toContain("text-decoration: none");
+  });
+
+  it("does not throw when <secure-email> has invalid base64 data", () => {
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const secureEmail = document.createElement("secure-email");
+    secureEmail.setAttribute("data-email", "invalid_base64!!!");
+
+    expect(() => {
+      document.body.appendChild(secureEmail);
+    }).not.toThrow();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Failed to decode email",
+      expect.any(Error),
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it("does nothing when <secure-email> lacks data-email attribute", () => {
+    const secureEmail = document.createElement("secure-email");
+    document.body.appendChild(secureEmail);
+    expect(secureEmail.childNodes.length).toBe(0);
+  });
 });
