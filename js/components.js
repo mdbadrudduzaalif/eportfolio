@@ -1,24 +1,67 @@
 class NavBar extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
-<nav>
-<a href="index.html" class="nav-home" aria-label="Home">
-<svg class="home-icon" viewBox="0 0 24 24" aria-hidden="true">
-<path d="M3 10.5L12 3l9 7.5"></path>
-<path d="M5 9.5V21h14V9.5"></path>
-<path d="M10 21v-6h4v6"></path>
-</svg>
-</a>
-<div class="nav-links">
-<a href="projects.html">Projects</a>
-<a href="about.html">About</a>
-<a href="education.html">Education</a>
-<a href="resume.html">Resume</a>
-<a href="contact.html">Contact</a>
-        <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
-</div>
-</nav>
-        `;
+    if (this.hasChildNodes()) this.replaceChildren();
+
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    this.appendChild(skipLink);
+
+    const nav = document.createElement("nav");
+
+    const homeLink = document.createElement("a");
+    homeLink.href = "index.html";
+    homeLink.className = "nav-home";
+    homeLink.setAttribute("aria-label", "Home");
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path1 = document.createElementNS(svgNS, "path");
+    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS(svgNS, "path");
+    path2.setAttribute("d", "M5 9.5V21h14V9.5");
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS(svgNS, "path");
+    path3.setAttribute("d", "M10 21v-6h4v6");
+    svg.appendChild(path3);
+
+    homeLink.appendChild(svg);
+    nav.appendChild(homeLink);
+
+    const navLinks = document.createElement("div");
+    navLinks.className = "nav-links";
+
+    const linksData = [
+      { href: "projects.html", text: "Projects" },
+      { href: "about.html", text: "About" },
+      { href: "education.html", text: "Education" },
+      { href: "resume.html", text: "Resume" },
+      { href: "contact.html", text: "Contact" },
+    ];
+
+    linksData.forEach((data) => {
+      const a = document.createElement("a");
+      a.href = data.href;
+      a.textContent = data.text;
+      navLinks.appendChild(a);
+    });
+
+    const toggleBtn = document.createElement("button");
+    toggleBtn.className = "theme-toggle";
+    toggleBtn.setAttribute("aria-label", "Toggle theme");
+    toggleBtn.textContent = "☀️";
+    navLinks.appendChild(toggleBtn);
+
+    nav.appendChild(navLinks);
+    this.appendChild(nav);
 
     const path = window.location.pathname;
     let page = path.split("/").pop();
@@ -63,13 +106,37 @@ customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
-    this.innerHTML = `
-<div class="lightbox" style="display: none;">
-<button class="lightbox-close" aria-label="Close lightbox">&times;</button>
-<img class="lightbox-img" alt="Enlarged view">
-<p class="lightbox-error" style="display:none; color:white;">Image failed to load</p>
-</div>
-        `;
+    if (this.hasChildNodes()) this.replaceChildren();
+
+    const div = document.createElement('div');
+    div.className = 'lightbox';
+    div.style.display = 'none';
+    div.setAttribute('aria-hidden', 'true');
+    div.setAttribute('role', 'dialog');
+    div.setAttribute('aria-modal', 'true');
+    div.setAttribute('aria-label', 'Image Lightbox');
+
+    const button = document.createElement('button');
+    button.className = 'lightbox-close';
+    button.setAttribute('aria-label', 'Close lightbox');
+    button.innerHTML = '&times;';
+
+    const imgEl = document.createElement('img');
+    imgEl.className = 'lightbox-img';
+    imgEl.alt = 'Enlarged view';
+
+    const p = document.createElement('p');
+    p.className = 'lightbox-error';
+    p.style.display = 'none';
+    p.style.color = 'white';
+    p.textContent = 'Image failed to load';
+
+    div.appendChild(button);
+    div.appendChild(imgEl);
+    div.appendChild(p);
+
+    this.appendChild(div);
+
     const lightbox = this.querySelector(".lightbox");
     const img = this.querySelector(".lightbox-img");
     const errorText = this.querySelector(".lightbox-error");
@@ -102,11 +169,15 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     const img = this.querySelector(".lightbox-img");
     const errorText = this.querySelector(".lightbox-error");
+    const closeBtn = this.querySelector(".lightbox-close");
     if (lightbox && img) {
+      this._previouslyFocusedElement = document.activeElement;
       img.src = src;
       img.style.display = "block";
       if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
+      lightbox.setAttribute("aria-hidden", "false");
+      if (closeBtn) closeBtn.focus();
       document.addEventListener("keydown", this._handleKeyDown);
     }
   }
@@ -115,6 +186,11 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     if (lightbox) {
       lightbox.style.display = "none";
+      lightbox.setAttribute("aria-hidden", "true");
+      if (this._previouslyFocusedElement) {
+        this._previouslyFocusedElement.focus();
+        this._previouslyFocusedElement = null;
+      }
       document.removeEventListener("keydown", this._handleKeyDown);
     }
   }
@@ -135,26 +211,67 @@ document.addEventListener("click", (e) => {
 
 class SiteFooter extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const currentYear = new Date().getFullYear();
-    this.innerHTML = `
-<footer>
-<span class="footer-copy">© ${currentYear} MD Badrudduza Alif. All rights reserved.</span>
-<span class="footer-links">
-<a class="footer-link github-link" href="https://github.com/mdbadrudduzaalif" aria-label="GitHub" title="GitHub" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/github.png" class="footer-icon" alt="GitHub">
-</a>
-<a class="footer-link" href="https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/" aria-label="LinkedIn" title="LinkedIn" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/linkedin.png" class="footer-icon" alt="LinkedIn">
-</a>
-<a class="footer-link" href="https://www.facebook.com/mdbadrudduza.alif" aria-label="Facebook" title="Facebook" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/facebook.png" class="footer-icon" alt="Facebook">
-</a>
-<a class="footer-link" href="https://wa.me/8801704448723" aria-label="WhatsApp" title="WhatsApp" target="_blank" rel="noopener noreferrer">
-<img src="assets/images/whatsapp.png" class="footer-icon" alt="WhatsApp">
-</a>
-</span>
-</footer>
-        `;
+
+    const footer = document.createElement("footer");
+
+    const footerCopy = document.createElement("span");
+    footerCopy.className = "footer-copy";
+    footerCopy.textContent = `© ${currentYear} MD Badrudduza Alif. All rights reserved.`;
+
+    const footerLinks = document.createElement("span");
+    footerLinks.className = "footer-links";
+
+    const socialLinks = [
+      { href: "https://github.com/mdbadrudduzaalif", label: "GitHub", img: "assets/images/github.png", className: "footer-link github-link" },
+      { href: "https://www.linkedin.com/in/md-badrudduza-alif-7a495032a/", label: "LinkedIn", img: "assets/images/linkedin.png", className: "footer-link" },
+      { href: "https://www.facebook.com/mdbadrudduza.alif", label: "Facebook", img: "assets/images/facebook.png", className: "footer-link" },
+      { href: "https://wa.me/8801704448723", label: "WhatsApp", img: "assets/images/whatsapp.png", className: "footer-link" }
+    ];
+
+    socialLinks.forEach(link => {
+      const a = document.createElement("a");
+      a.className = link.className;
+      a.href = link.href;
+      a.setAttribute("aria-label", link.label);
+      a.title = link.label;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+
+      const img = document.createElement("img");
+      img.src = link.img;
+      img.className = "footer-icon";
+      img.alt = link.label;
+
+      a.appendChild(img);
+      footerLinks.appendChild(a);
+    });
+
+    footer.appendChild(footerCopy);
+    footer.appendChild(footerLinks);
+    this.appendChild(footer);
   }
 }
 customElements.define("site-footer", SiteFooter);
+
+class SecureEmail extends HTMLElement {
+  connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
+    const encodedEmail = this.getAttribute('data-email');
+    if (encodedEmail) {
+      try {
+        const decodedEmail = atob(encodedEmail);
+        const link = document.createElement('a');
+        link.href = `mailto:${decodedEmail}`;
+        link.textContent = decodedEmail;
+        this.appendChild(link);
+      } catch (e) {
+        console.error("Failed to decode email", e);
+      }
+    }
+  }
+}
+customElements.define("secure-email", SecureEmail);

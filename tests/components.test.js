@@ -1,4 +1,4 @@
-require('../components.js');
+require('../js/components.js');
 
 describe('Web Components', () => {
 
