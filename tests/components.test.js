@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 require("../components.js");
+=======
+require("../js/components.js");
+>>>>>>> origin/main
 
 describe("Web Components", () => {
   beforeEach(() => {
@@ -47,6 +51,7 @@ describe("Web Components", () => {
     expect(activeLink.classList.contains("nav-home")).toBe(true);
   });
 
+<<<<<<< HEAD
   it("nav-bar correctly identities theme toggler button and updates localStorage and body class", () => {
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -145,6 +150,84 @@ describe("Web Components", () => {
     expect(lightboxDiv.style.display).toBe("none");
   });
 
+=======
+  it("nav-bar correctly identifies active link when query parameters or hashes are present", () => {
+    // Mock a URL with a query parameter and hash
+    delete window.location;
+    window.location = new URL("http://localhost/projects.html?sort=desc#main");
+
+    const nav = document.createElement("nav-bar");
+    document.body.appendChild(nav);
+
+    const activeLink = nav.querySelector("a.active");
+    expect(activeLink).not.toBeNull();
+    expect(activeLink.textContent.trim()).toBe("Projects");
+    expect(activeLink.getAttribute("aria-current")).toBe("page");
+  });
+
+  it("renders <site-footer> correctly", () => {
+    const footer = document.createElement("site-footer");
+    document.body.appendChild(footer);
+    const currentYear = new Date().getFullYear();
+
+    expect(footer.querySelector("footer")).not.toBeNull();
+    expect(footer.querySelector(".footer-copy").textContent).toContain(
+      `© ${currentYear} MD Badrudduza Alif`,
+    );
+  });
+
+  it("renders <image-lightbox> correctly and can open/close", () => {
+    const lightboxComp = document.createElement("image-lightbox");
+    document.body.appendChild(lightboxComp);
+
+    const lightboxDiv = lightboxComp.querySelector(".lightbox");
+    const img = lightboxComp.querySelector(".lightbox-img");
+    const closeBtn = lightboxComp.querySelector(".lightbox-close");
+
+    expect(lightboxDiv).not.toBeNull();
+    expect(img).not.toBeNull();
+    expect(closeBtn).not.toBeNull();
+    expect(lightboxDiv.style.display).toBe("none");
+    expect(lightboxDiv.getAttribute("aria-hidden")).toBe("true");
+
+    // Test open
+    const testSrc = "http://localhost/test-image.jpg";
+
+    // Add a dummy focused element to test focus restoration
+    const dummyBtn = document.createElement("button");
+    document.body.appendChild(dummyBtn);
+    dummyBtn.focus();
+
+    lightboxComp.open(testSrc);
+
+    expect(lightboxDiv.style.display).toBe("flex");
+    expect(img.src).toBe(testSrc);
+    expect(lightboxDiv.getAttribute("aria-hidden")).toBe("false");
+
+    // Test ARIA attributes
+    expect(lightboxDiv.getAttribute("role")).toBe("dialog");
+    expect(lightboxDiv.getAttribute("aria-modal")).toBe("true");
+    expect(lightboxDiv.getAttribute("aria-label")).toBe("Image Lightbox");
+
+    // Check if close button is focused
+    expect(document.activeElement).toBe(closeBtn);
+
+    // Test close with close button
+    closeBtn.click();
+    expect(lightboxDiv.style.display).toBe("none");
+    expect(lightboxDiv.getAttribute("aria-hidden")).toBe("true");
+
+    // Check if previous focus is restored
+    expect(document.activeElement).toBe(dummyBtn);
+
+    // Test close with escape key
+    lightboxComp.open(testSrc);
+    expect(lightboxDiv.style.display).toBe("flex");
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(lightboxDiv.style.display).toBe("none");
+  });
+
+>>>>>>> origin/main
   it("does not throw when close() is called and lightbox element is missing", () => {
     const lightboxComp = document.createElement("image-lightbox");
     document.body.appendChild(lightboxComp);
