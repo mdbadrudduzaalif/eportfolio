@@ -131,6 +131,7 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+<<<<<<< HEAD
 });
 
 it("renders <secure-email> correctly and decodes base64 email", () => {
@@ -143,4 +144,6 @@ it("renders <secure-email> correctly and decodes base64 email", () => {
   expect(link).not.toBeNull();
   expect(link.href).toBe("mailto:test@example.com");
   expect(link.textContent).toBe("test@example.com");
+=======
+>>>>>>> origin/main
 });

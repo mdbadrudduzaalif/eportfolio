@@ -5,6 +5,15 @@ class NavBar extends HTMLElement {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
 
+<<<<<<< HEAD
+=======
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    nav.appendChild(skipLink);
+
+>>>>>>> origin/main
     const homeLink = document.createElement("a");
     homeLink.href = "index.html";
     homeLink.className = "nav-home";
@@ -102,6 +111,7 @@ class NavBar extends HTMLElement {
     }
   }
 }
+
 customElements.define("nav-bar", NavBar);
 
 class ImageLightbox extends HTMLElement {
@@ -111,6 +121,10 @@ class ImageLightbox extends HTMLElement {
     const lightbox = document.createElement("div");
     lightbox.className = "lightbox";
     lightbox.style.display = "none";
+<<<<<<< HEAD
+=======
+    lightbox.setAttribute("aria-hidden", "true");
+>>>>>>> origin/main
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", "Image Lightbox");
@@ -125,6 +139,7 @@ class ImageLightbox extends HTMLElement {
     img.className = "lightbox-img";
     img.alt = "Enlarged view";
 
+<<<<<<< HEAD
     const errorText = document.createElement("p");
     errorText.className = "lightbox-error";
     errorText.style.display = "none";
@@ -140,6 +155,11 @@ class ImageLightbox extends HTMLElement {
       img.style.display = "none";
       errorText.style.display = "block";
     });
+=======
+    lightbox.appendChild(closeBtn);
+    lightbox.appendChild(img);
+    this.appendChild(lightbox);
+>>>>>>> origin/main
 
     lightbox.addEventListener("click", (e) => {
       if (
@@ -162,13 +182,14 @@ class ImageLightbox extends HTMLElement {
     const lightbox = this.querySelector(".lightbox");
     const img = this.querySelector(".lightbox-img");
     const closeBtn = this.querySelector(".lightbox-close");
+<<<<<<< HEAD
     const errorText = this.querySelector(".lightbox-error");
+=======
+>>>>>>> origin/main
 
     if (lightbox && img) {
       this._previousFocus = document.activeElement;
       img.src = src;
-      img.style.display = "block";
-      if (errorText) errorText.style.display = "none";
       lightbox.style.display = "flex";
       lightbox.setAttribute("aria-hidden", "false");
       document.addEventListener("keydown", this._handleKeyDown);
