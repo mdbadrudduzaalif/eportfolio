@@ -91,19 +91,24 @@ class NavBar extends HTMLElement {
     if (themeToggleBtnRef) {
       themeToggleBtnRef.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
         if (document.body.classList.contains("theme-light")) {
           localStorage.setItem("theme", "light");
           themeToggleBtnRef.textContent = "🌙";
+          if (themeMeta) themeMeta.setAttribute("content", "#f8fafc");
         } else {
           localStorage.removeItem("theme");
           themeToggleBtnRef.textContent = "☀️";
+          if (themeMeta) themeMeta.setAttribute("content", "#0f172a");
         }
       });
 
       const savedTheme = localStorage.getItem("theme");
+      const themeMeta = document.querySelector('meta[name="theme-color"]');
       if (savedTheme === "light") {
         document.body.classList.add("theme-light");
         themeToggleBtnRef.textContent = "🌙";
+        if (themeMeta) themeMeta.setAttribute("content", "#f8fafc");
       }
     }
   }
