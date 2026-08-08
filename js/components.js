@@ -91,19 +91,28 @@ class NavBar extends HTMLElement {
     if (themeToggleBtnRef) {
       themeToggleBtnRef.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
+        const metaThemeColor = document.querySelector(
+          'meta[name="theme-color"]',
+        );
         if (document.body.classList.contains("theme-light")) {
           localStorage.setItem("theme", "light");
           themeToggleBtnRef.textContent = "🌙";
+          if (metaThemeColor) metaThemeColor.setAttribute("content", "#f8fafc");
         } else {
           localStorage.removeItem("theme");
           themeToggleBtnRef.textContent = "☀️";
+          if (metaThemeColor) metaThemeColor.setAttribute("content", "#0f172a");
         }
       });
 
       const savedTheme = localStorage.getItem("theme");
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
       if (savedTheme === "light") {
         document.body.classList.add("theme-light");
         themeToggleBtnRef.textContent = "🌙";
+        if (metaThemeColor) metaThemeColor.setAttribute("content", "#f8fafc");
+      } else {
+        if (metaThemeColor) metaThemeColor.setAttribute("content", "#0f172a");
       }
     }
   }
@@ -122,7 +131,6 @@ class ImageLightbox extends HTMLElement {
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", "Image Lightbox");
-    lightbox.setAttribute("aria-hidden", "true");
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "lightbox-close";
@@ -262,11 +270,17 @@ customElements.define("site-footer", SiteFooter);
 
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
