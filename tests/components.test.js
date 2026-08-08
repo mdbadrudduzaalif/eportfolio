@@ -131,4 +131,42 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it('dynamically updates <meta name="theme-color"> on theme toggle', () => {
+    // Setup meta tag
+    const metaTag = document.createElement("meta");
+    metaTag.name = "theme-color";
+    metaTag.content = "#0f172a";
+    document.head.appendChild(metaTag);
+
+    const nav = document.createElement("nav-bar");
+    document.body.appendChild(nav);
+
+    const themeToggleBtn = nav.querySelector(".theme-toggle");
+    expect(themeToggleBtn).not.toBeNull();
+
+    // Trigger toggle (light theme)
+    themeToggleBtn.click();
+    expect(document.body.classList.contains("theme-light")).toBe(true);
+    expect(metaTag.getAttribute("content")).toBe("#f8fafc");
+
+    // Trigger toggle again (dark theme)
+    themeToggleBtn.click();
+    expect(document.body.classList.contains("theme-light")).toBe(false);
+    expect(metaTag.getAttribute("content")).toBe("#0f172a");
+  });
+
+  it("renders <secure-email> correctly and safely without innerHTML", () => {
+    const secureEmail = document.createElement("secure-email");
+    // Test base64 string for "test@example.com" -> dGVzdEBleGFtcGxlLmNvbQ==
+    secureEmail.setAttribute("data-email", "dGVzdEBleGFtcGxlLmNvbQ==");
+    document.body.appendChild(secureEmail);
+
+    const aTag = secureEmail.querySelector("a");
+    expect(aTag).not.toBeNull();
+    expect(aTag.getAttribute("href")).toBe("mailto:test@example.com");
+    expect(aTag.textContent).toBe("test@example.com");
+    // jsdom silently drops invalid CSS properties including `var()` from the inline style attribute
+    expect(aTag.style.textDecoration).toBe("none");
+  });
 });
