@@ -66,13 +66,20 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
-      const parsedPage = path.split("/").pop();
+      // Use pathname directly to handle relative paths in tests more reliably
+      const pathname = window.location.pathname || "";
+      let pathToParse = pathname;
+
+      try {
+        pathToParse = new URL(window.location.href).pathname;
+      } catch (e) {}
+
+      const parsedPage = pathToParse.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs
     }
 
     const links = this.querySelectorAll("a");
@@ -89,22 +96,36 @@ class NavBar extends HTMLElement {
 
     const themeToggleBtnRef = this.querySelector(".theme-toggle");
     if (themeToggleBtnRef) {
+      const updateThemeMeta = (isLight) => {
+        let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+        if (!metaThemeColor) {
+          metaThemeColor = document.createElement("meta");
+          metaThemeColor.name = "theme-color";
+          document.head.appendChild(metaThemeColor);
+        }
+        metaThemeColor.content = isLight ? "#f8fafc" : "#0f172a";
+      };
+
       themeToggleBtnRef.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
-        if (document.body.classList.contains("theme-light")) {
+        const isLight = document.body.classList.contains("theme-light");
+        if (isLight) {
           localStorage.setItem("theme", "light");
           themeToggleBtnRef.textContent = "🌙";
         } else {
           localStorage.removeItem("theme");
           themeToggleBtnRef.textContent = "☀️";
         }
+        updateThemeMeta(isLight);
       });
 
       const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "light") {
+      const isLight = savedTheme === "light";
+      if (isLight) {
         document.body.classList.add("theme-light");
         themeToggleBtnRef.textContent = "🌙";
       }
+      updateThemeMeta(isLight);
     }
   }
 }
@@ -262,11 +283,17 @@ customElements.define("site-footer", SiteFooter);
 
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }

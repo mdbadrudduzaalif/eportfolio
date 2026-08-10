@@ -131,4 +131,46 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly and safely decodes base64 email", () => {
+    const secureEmail = document.createElement("secure-email");
+    const testEmail = "test@example.com";
+    secureEmail.setAttribute("data-email", btoa(testEmail));
+    document.body.appendChild(secureEmail);
+
+    const a = secureEmail.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.getAttribute("href")).toBe(`mailto:${testEmail}`);
+    expect(a.textContent).toBe(testEmail);
+    // Note: Checking specific css variables in JSDOM inline styles might not match exactly, so we just check it exists
+    expect(a.style.textDecoration).toBe("none");
+  });
+
+  it("nav-bar theme toggle correctly updates theme-color meta tag", () => {
+    // Add initial meta tag
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    meta.content = "#0f172a";
+    document.head.appendChild(meta);
+
+    const nav = document.createElement("nav-bar");
+    document.body.appendChild(nav);
+
+    const toggleBtn = nav.querySelector(".theme-toggle");
+    expect(toggleBtn).not.toBeNull();
+
+    // Initial click: toggle to light theme
+    toggleBtn.click();
+    const updatedMetaLight = document.head.querySelector(
+      'meta[name="theme-color"]',
+    );
+    expect(updatedMetaLight.content).toBe("#f8fafc");
+
+    // Second click: toggle back to dark theme
+    toggleBtn.click();
+    const updatedMetaDark = document.head.querySelector(
+      'meta[name="theme-color"]',
+    );
+    expect(updatedMetaDark.content).toBe("#0f172a");
+  });
 });
