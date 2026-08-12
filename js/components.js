@@ -66,13 +66,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs if any
     }
 
     const links = this.querySelectorAll("a");
@@ -188,7 +188,29 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    let lightbox = document.querySelector("image-lightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("image-lightbox");
+      document.body.appendChild(lightbox);
+    }
+    lightbox.open(e.target.src);
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]") &&
+    (e.key === "Enter" || e.key === " ")
+  ) {
+    e.preventDefault();
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -262,13 +284,23 @@ customElements.define("site-footer", SiteFooter);
 
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
+        const span = document.createElement("span");
+        span.style.color = "var(--text-muted)";
+        span.textContent = "Email unavailable";
+        this.appendChild(span);
       }
     }
   }

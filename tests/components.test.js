@@ -131,4 +131,33 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly with valid base64 email", () => {
+    const emailComp = document.createElement("secure-email");
+    // bWVAZXhhbXBsZS5jb20= is me@example.com
+    emailComp.setAttribute("data-email", "bWVAZXhhbXBsZS5jb20=");
+    document.body.appendChild(emailComp);
+
+    const a = emailComp.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.href).toBe("mailto:me@example.com");
+    expect(a.textContent).toBe("me@example.com");
+  });
+
+  it("renders fallback in <secure-email> with invalid base64", () => {
+    // Suppress console.error during this test
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const emailComp = document.createElement("secure-email");
+    emailComp.setAttribute("data-email", "invalid_base64!!!");
+    document.body.appendChild(emailComp);
+
+    const span = emailComp.querySelector("span");
+    expect(span).not.toBeNull();
+    expect(span.textContent).toBe("Email unavailable");
+
+    consoleSpy.mockRestore();
+  });
 });
