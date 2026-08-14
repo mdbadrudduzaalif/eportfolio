@@ -1,6 +1,23 @@
 "use strict";
 
+/**
+ * NavBar component provides the main navigation for the site,
+ * including a skip link for accessibility and a theme toggle.
+ */
 class NavBar extends HTMLElement {
+  /**
+   * Helper method to create a navigation link element.
+   * @param {Object} data - Contains href and text for the link.
+   * @returns {HTMLAnchorElement} The created anchor element.
+   * @private
+   */
+  _createNavLink(data) {
+    const a = document.createElement("a");
+    a.href = data.href;
+    a.textContent = data.text;
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
@@ -49,10 +66,7 @@ class NavBar extends HTMLElement {
     ];
 
     linksData.forEach((data) => {
-      const a = document.createElement("a");
-      a.href = data.href;
-      a.textContent = data.text;
-      navLinks.appendChild(a);
+      navLinks.appendChild(this._createNavLink(data));
     });
 
     const themeToggleBtn = document.createElement("button");
@@ -111,6 +125,10 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox component provides a modal view for images.
+ * Manages its own open/close state and handles escape key for accessibility.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -186,19 +204,61 @@ class ImageLightbox extends HTMLElement {
 }
 customElements.define("image-lightbox", ImageLightbox);
 
-// Global listener for images with data-lightbox attribute
+// Helper to open lightbox globally
+function openLightbox(target) {
+  let lightbox = document.querySelector("image-lightbox");
+  if (!lightbox) {
+    lightbox = document.createElement("image-lightbox");
+    document.body.appendChild(lightbox);
+  }
+  lightbox.open(target.src);
+}
+
+// Global listener for images with data-lightbox attribute (Click)
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
-    }
-    lightbox.open(e.target.src);
+  if (e.target.nodeType === 1 && typeof e.target.matches === "function" && e.target.matches("img[data-lightbox]")) {
+    openLightbox(e.target);
   }
 });
 
+// Global listener for images with data-lightbox attribute (Keydown)
+document.addEventListener("keydown", (e) => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.nodeType === 1 && typeof e.target.matches === "function" && e.target.matches("img[data-lightbox]")) {
+    e.preventDefault();
+    openLightbox(e.target);
+  }
+});
+
+/**
+ * SiteFooter component provides the standard footer for all pages,
+ * including dynamic copyright year and social media links.
+ */
 class SiteFooter extends HTMLElement {
+  /**
+   * Helper method to create a social media link element.
+   * @param {Object} link - Contains href, label, and img source for the link.
+   * @returns {HTMLAnchorElement} The created anchor element.
+   * @private
+   */
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className = "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
@@ -235,22 +295,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
@@ -260,13 +305,24 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail component dynamically decodes a base64 encoded email address
+ * to help prevent email harvesting by bots.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }

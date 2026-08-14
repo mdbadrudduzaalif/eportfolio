@@ -131,4 +131,54 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly", () => {
+    const secureEmail = document.createElement("secure-email");
+    // "test@example.com" base64 encoded
+    secureEmail.setAttribute("data-email", "dGVzdEBleGFtcGxlLmNvbQ==");
+    document.body.appendChild(secureEmail);
+
+    const a = secureEmail.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.href).toBe("mailto:test@example.com");
+    expect(a.textContent).toBe("test@example.com");
+  });
+
+  it("global data-lightbox listeners work properly and safely", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/test.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Test click on img
+    img.click();
+    let lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    let lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+
+    // Disconnect so we can test keydown on a fresh element
+    document.body.innerHTML = "";
+    document.body.appendChild(img);
+
+    // Test keydown Enter on img
+    img.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+
+    // Test keydown Space on img
+    img.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+
+    // Test non-element target (Document) to ensure it doesn't throw when missing .matches()
+    expect(() => {
+      document.dispatchEvent(new Event("click", { bubbles: true }));
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    }).not.toThrow();
+  });
 });
