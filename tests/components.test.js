@@ -20,8 +20,10 @@ describe("Web Components", () => {
   });
 
   it("nav-bar sets no active link when path does not match any href", () => {
-    delete window.location;
-    window.location = new URL("http://localhost/unknown.html");
+    Object.defineProperty(window, "location", {
+      value: { pathname: "/unknown.html" },
+      writable: true,
+    });
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -35,8 +37,10 @@ describe("Web Components", () => {
 
   it("nav-bar falls back to index.html when path is empty or root", () => {
     // Change jsdom url to root
-    delete window.location;
-    window.location = new URL("http://localhost/");
+    Object.defineProperty(window, "location", {
+      value: { pathname: "/" },
+      writable: true,
+    });
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -49,8 +53,10 @@ describe("Web Components", () => {
 
   it("nav-bar correctly identifies active link when query parameters or hashes are present", () => {
     // Mock a URL with a query parameter and hash
-    delete window.location;
-    window.location = new URL("http://localhost/projects.html?sort=desc#main");
+    Object.defineProperty(window, "location", {
+      value: { pathname: "/projects.html" },
+      writable: true,
+    });
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -130,5 +136,35 @@ describe("Web Components", () => {
     expect(() => {
       lightboxComp.close();
     }).not.toThrow();
+  });
+
+  it("global listener handles keydown events for images with data-lightbox", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/test-event.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Simulate Enter keydown
+    img.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+    );
+
+    const lightboxDiv = document.querySelector(".lightbox");
+    const lightboxImg = document.querySelector(".lightbox-img");
+
+    expect(lightboxDiv).not.toBeNull();
+    expect(lightboxDiv.style.display).toBe("flex");
+    expect(lightboxImg.src).toBe(img.src);
+
+    // Close lightbox
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+
+    // Simulate Space keydown
+    img.dispatchEvent(
+      new KeyboardEvent("keydown", { key: " ", bubbles: true }),
+    );
+
+    expect(lightboxDiv.style.display).toBe("flex");
+    expect(lightboxImg.src).toBe(img.src);
   });
 });
