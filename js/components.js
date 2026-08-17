@@ -1,21 +1,11 @@
 "use strict";
 
+/**
+ * Navigation Bar Component.
+ * Provides main site navigation, skip to content link, and theme toggle.
+ */
 class NavBar extends HTMLElement {
-  connectedCallback() {
-    if (this.hasChildNodes()) this.replaceChildren();
-    const nav = document.createElement("nav");
-
-    const skipLink = document.createElement("a");
-    skipLink.href = "#main-content";
-    skipLink.className = "skip-link";
-    skipLink.textContent = "Skip to main content";
-    nav.appendChild(skipLink);
-
-    const homeLink = document.createElement("a");
-    homeLink.href = "index.html";
-    homeLink.className = "nav-home";
-    homeLink.setAttribute("aria-label", "Home");
-
+  #createSvgIcon() {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("class", "home-icon");
@@ -33,8 +23,25 @@ class NavBar extends HTMLElement {
     const path3 = document.createElementNS(svgNS, "path");
     path3.setAttribute("d", "M10 21v-6h4v6");
     svg.appendChild(path3);
+    return svg;
+  }
 
-    homeLink.appendChild(svg);
+  connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+    const nav = document.createElement("nav");
+
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    nav.appendChild(skipLink);
+
+    const homeLink = document.createElement("a");
+    homeLink.href = "index.html";
+    homeLink.className = "nav-home";
+    homeLink.setAttribute("aria-label", "Home");
+
+    homeLink.appendChild(this.#createSvgIcon());
     nav.appendChild(homeLink);
 
     const navLinks = document.createElement("div");
@@ -66,13 +73,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs if any
     }
 
     const links = this.querySelectorAll("a");
@@ -111,6 +118,10 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Image Lightbox Component.
+ * Accessible modal for viewing enlarged images.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,8 +198,13 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+function handleLightboxEvent(e) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,9 +212,49 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
+}
+
+document.addEventListener("click", handleLightboxEvent);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    // Prevent scrolling for Spacebar when focused on the image
+    if (
+      e.key === " " &&
+      e.target &&
+      e.target.nodeType === 1 &&
+      typeof e.target.matches === "function" &&
+      e.target.matches("img[data-lightbox]")
+    ) {
+      e.preventDefault();
+    }
+    handleLightboxEvent(e);
+  }
 });
 
+/**
+ * Site Footer Component.
+ * Displays copyright info and social links.
+ */
 class SiteFooter extends HTMLElement {
+  #createSocialLink(linkData) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (linkData.label === "GitHub" ? " github-link" : "");
+    a.href = linkData.href;
+    a.setAttribute("aria-label", linkData.label);
+    a.title = linkData.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = linkData.img;
+    img.className = "footer-icon";
+    img.alt = linkData.label;
+
+    a.appendChild(img);
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
@@ -234,23 +290,8 @@ class SiteFooter extends HTMLElement {
       },
     ];
 
-    socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+    socialLinks.forEach((linkData) => {
+      footerLinks.appendChild(this.#createSocialLink(linkData));
     });
 
     footer.appendChild(footerCopy);
@@ -260,13 +301,23 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Secure Email Component.
+ * Safely decodes base64 emails and generates mailto links.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const link = document.createElement("a");
+        link.href = `mailto:${email}`;
+        link.textContent = email;
+        link.style.color = "var(--accent)";
+        link.style.textDecoration = "none";
+        if (this.hasChildNodes()) this.replaceChildren();
+        this.appendChild(link);
       } catch (e) {
         console.error("Failed to decode email", e);
       }

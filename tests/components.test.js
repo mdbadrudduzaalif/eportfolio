@@ -131,4 +131,49 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("handles keyboard interaction and safe element matching for lightbox", () => {
+    // We add an img element with data-lightbox to test the document listener
+    const img = document.createElement("img");
+    img.src = "http://localhost/test-image-keyboard.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Simulate Enter keydown
+    const enterEvent = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+    Object.defineProperty(enterEvent, "target", { value: img, enumerable: true });
+    document.dispatchEvent(enterEvent);
+
+    // The lightbox component should be added to the DOM and opened
+    const lightboxComp = document.querySelector("image-lightbox");
+    expect(lightboxComp).not.toBeNull();
+    const lightboxDiv = lightboxComp.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    lightboxComp.close();
+    expect(lightboxDiv.style.display).toBe("none");
+
+    // Simulate Space keydown
+    const spaceEvent = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(spaceEvent, "target", { value: img, enumerable: true });
+    document.dispatchEvent(spaceEvent);
+
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightboxComp.close();
+  });
+
+  it("renders <secure-email> correctly", () => {
+    const emailComp = document.createElement("secure-email");
+    emailComp.setAttribute("data-email", "dGVzdEBleGFtcGxlLmNvbQ=="); // test@example.com
+    document.body.appendChild(emailComp);
+
+    const link = emailComp.querySelector("a");
+    expect(link).not.toBeNull();
+    expect(link.href).toBe("mailto:test@example.com");
+    expect(link.textContent).toBe("test@example.com");
+    // JSDOM completely drops color if it uses a var(), so we just check what's remaining.
+    // Instead of styles, checking the resulting element structure is fine here,
+    // since we know we assigned the property.
+    expect(link.style.textDecoration).toBe("none");
+  });
 });
