@@ -1,0 +1,9 @@
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/profile.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /js/components.js HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/linkedin.png HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/aust-oscillon.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/facebook.png HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/whatsapp.png HTTP/1.1" 200 -
+127.0.0.1 - - [29/Sep/2026 23:29:26] "GET /assets/images/github.png HTTP/1.1" 200 -

@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Custom Element representing the navigation bar.
+ * Provides links to pages and toggles the light/dark theme.
+ * Includes accessibility features like a skip link and ARIA attributes.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -16,24 +21,7 @@ class NavBar extends HTMLElement {
     homeLink.className = "nav-home";
     homeLink.setAttribute("aria-label", "Home");
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("class", "home-icon");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("aria-hidden", "true");
-
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
-
+    const svg = this._createSVGIcon();
     homeLink.appendChild(svg);
     nav.appendChild(homeLink);
 
@@ -66,13 +54,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback
     }
 
     const links = this.querySelectorAll("a");
@@ -87,30 +75,73 @@ class NavBar extends HTMLElement {
       }
     });
 
-    const themeToggleBtnRef = this.querySelector(".theme-toggle");
-    if (themeToggleBtnRef) {
-      themeToggleBtnRef.addEventListener("click", () => {
-        document.body.classList.toggle("theme-light");
-        if (document.body.classList.contains("theme-light")) {
-          localStorage.setItem("theme", "light");
-          themeToggleBtnRef.textContent = "🌙";
-        } else {
-          localStorage.removeItem("theme");
-          themeToggleBtnRef.textContent = "☀️";
-        }
-      });
+    this._setupThemeToggle();
+  }
 
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "light") {
-        document.body.classList.add("theme-light");
-        themeToggleBtnRef.textContent = "🌙";
+  _createSVGIcon() {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path1 = document.createElementNS(svgNS, "path");
+    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS(svgNS, "path");
+    path2.setAttribute("d", "M5 9.5V21h14V9.5");
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS(svgNS, "path");
+    path3.setAttribute("d", "M10 21v-6h4v6");
+    svg.appendChild(path3);
+
+    return svg;
+  }
+
+  _setupThemeToggle() {
+    const themeToggleBtnRef = this.querySelector(".theme-toggle");
+    if (!themeToggleBtnRef) return;
+
+    const updateThemeColorMeta = (isLight) => {
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute("content", isLight ? "#f8fafc" : "#0f172a");
       }
+    };
+
+    themeToggleBtnRef.addEventListener("click", () => {
+      document.body.classList.toggle("theme-light");
+      const isLight = document.body.classList.contains("theme-light");
+
+      if (isLight) {
+        localStorage.setItem("theme", "light");
+        themeToggleBtnRef.textContent = "🌙";
+      } else {
+        localStorage.removeItem("theme");
+        themeToggleBtnRef.textContent = "☀️";
+      }
+      updateThemeColorMeta(isLight);
+    });
+
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+      document.body.classList.add("theme-light");
+      themeToggleBtnRef.textContent = "🌙";
+      updateThemeColorMeta(true);
+    } else {
+      updateThemeColorMeta(false);
     }
   }
 }
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Custom Element representing an image lightbox.
+ * Allows opening and closing images in an accessible dialog overlay.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,8 +218,12 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+const handleLightboxEvent = (e) => {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,8 +231,22 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
+};
+
+document.addEventListener("click", handleLightboxEvent);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    if (e.key === " ") {
+      e.preventDefault(); // Prevent page scrolling
+    }
+    handleLightboxEvent(e);
+  }
 });
 
+/**
+ * Custom Element representing the site footer.
+ * Displays copyright info and social media links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -235,21 +284,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
+      const a = this._createSocialLink(link);
       footerLinks.appendChild(a);
     });
 
@@ -257,16 +292,46 @@ class SiteFooter extends HTMLElement {
     footer.appendChild(footerLinks);
     this.appendChild(footer);
   }
+
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Custom Element representing a secure email link.
+ * Decodes a base64 encoded email address and renders a mailto link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
