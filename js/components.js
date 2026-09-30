@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Navigation Bar Component
+ * Provides main site navigation, theme toggling, and skip links.
+ * Implements accessible routing and dynamic active states.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -16,24 +21,7 @@ class NavBar extends HTMLElement {
     homeLink.className = "nav-home";
     homeLink.setAttribute("aria-label", "Home");
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("class", "home-icon");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("aria-hidden", "true");
-
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
-
+    const svg = this._createHomeIcon();
     homeLink.appendChild(svg);
     nav.appendChild(homeLink);
 
@@ -66,13 +54,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid paths if any
     }
 
     const links = this.querySelectorAll("a");
@@ -107,10 +95,33 @@ class NavBar extends HTMLElement {
       }
     }
   }
+
+  _createHomeIcon() {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const paths = ["M3 10.5L12 3l9 7.5", "M5 9.5V21h14V9.5", "M10 21v-6h4v6"];
+
+    paths.forEach((d) => {
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", d);
+      svg.appendChild(path);
+    });
+
+    return svg;
+  }
 }
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Image Lightbox Component
+ * Accessible modal for viewing enlarged images.
+ * Supports keyboard navigation (Escape to close) and focus management.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,17 +198,37 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
+function handleLightboxTrigger(e) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    if (
+      e.type === "click" ||
+      (e.type === "keydown" && (e.key === "Enter" || e.key === " "))
+    ) {
+      if (e.type === "keydown") {
+        e.preventDefault();
+      }
+      let lightbox = document.querySelector("image-lightbox");
+      if (!lightbox) {
+        lightbox = document.createElement("image-lightbox");
+        document.body.appendChild(lightbox);
+      }
+      lightbox.open(e.target.src);
     }
-    lightbox.open(e.target.src);
   }
-});
+}
 
+document.addEventListener("click", handleLightboxTrigger);
+document.addEventListener("keydown", handleLightboxTrigger);
+
+/**
+ * Site Footer Component
+ * Renders copyright information and social links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -235,21 +266,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
+      const a = this._createSocialLink(link);
       footerLinks.appendChild(a);
     });
 
@@ -257,16 +274,48 @@ class SiteFooter extends HTMLElement {
     footer.appendChild(footerLinks);
     this.appendChild(footer);
   }
+
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.loading = "lazy";
+
+    a.appendChild(img);
+    return a;
+  }
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Secure Email Component
+ * Decodes a base64 email string and generates a safe mailto link.
+ * Avoids innerHTML for enhanced security against XSS.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
