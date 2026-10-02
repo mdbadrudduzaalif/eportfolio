@@ -1,21 +1,11 @@
 "use strict";
 
+/**
+ * NavBar Component
+ * Provides a responsive navigation bar with theme toggling and accessibility skip links.
+ */
 class NavBar extends HTMLElement {
-  connectedCallback() {
-    if (this.hasChildNodes()) this.replaceChildren();
-    const nav = document.createElement("nav");
-
-    const skipLink = document.createElement("a");
-    skipLink.href = "#main-content";
-    skipLink.className = "skip-link";
-    skipLink.textContent = "Skip to main content";
-    nav.appendChild(skipLink);
-
-    const homeLink = document.createElement("a");
-    homeLink.href = "index.html";
-    homeLink.className = "nav-home";
-    homeLink.setAttribute("aria-label", "Home");
-
+  _createHomeIcon() {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
     svg.setAttribute("class", "home-icon");
@@ -34,7 +24,25 @@ class NavBar extends HTMLElement {
     path3.setAttribute("d", "M10 21v-6h4v6");
     svg.appendChild(path3);
 
-    homeLink.appendChild(svg);
+    return svg;
+  }
+
+  connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+    const nav = document.createElement("nav");
+
+    const skipLink = document.createElement("a");
+    skipLink.href = "#main-content";
+    skipLink.className = "skip-link";
+    skipLink.textContent = "Skip to main content";
+    nav.appendChild(skipLink);
+
+    const homeLink = document.createElement("a");
+    homeLink.href = "index.html";
+    homeLink.className = "nav-home";
+    homeLink.setAttribute("aria-label", "Home");
+
+    homeLink.appendChild(this._createHomeIcon());
     nav.appendChild(homeLink);
 
     const navLinks = document.createElement("div");
@@ -66,13 +74,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs if any
     }
 
     const links = this.querySelectorAll("a");
@@ -111,6 +119,10 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox Component
+ * Creates an accessible modal for viewing enlarged images, supporting keyboard navigation.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -188,7 +200,11 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -198,7 +214,48 @@ document.addEventListener("click", (e) => {
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    e.preventDefault();
+    let lightbox = document.querySelector("image-lightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("image-lightbox");
+      document.body.appendChild(lightbox);
+    }
+    lightbox.open(e.target.src);
+  }
+});
+
+/**
+ * SiteFooter Component
+ * Displays the copyright notice and social media links.
+ */
 class SiteFooter extends HTMLElement {
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
@@ -235,22 +292,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
@@ -260,13 +302,17 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail Component
+ * Decodes a base64 encoded email address and renders a mailto link to deter scrapers.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        this.innerHTML = `<a href="mailto:${email}" class="contact-link">${email}</a>`;
       } catch (e) {
         console.error("Failed to decode email", e);
       }
