@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * NavBar Custom Element
+ * Manages the main navigation and theme toggling.
+ * Incorporates a skip link for accessibility.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -66,13 +71,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs if any
     }
 
     const links = this.querySelectorAll("a");
@@ -111,6 +116,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox Custom Element
+ * Provides a modal for enlarging and viewing images.
+ * Implements ARIA attributes for accessibility and supports keyboard navigation.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,8 +197,13 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+function handleLightboxOpen(e) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,8 +211,19 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
+}
+
+document.addEventListener("click", handleLightboxOpen);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    handleLightboxOpen(e);
+  }
 });
 
+/**
+ * SiteFooter Custom Element
+ * Generates the global footer including copyright and social links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -248,6 +274,7 @@ class SiteFooter extends HTMLElement {
       img.src = link.img;
       img.className = "footer-icon";
       img.alt = link.label;
+      img.loading = "lazy";
 
       a.appendChild(img);
       footerLinks.appendChild(a);
@@ -260,13 +287,25 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail Custom Element
+ * Decodes base64 encoded email addresses to prevent scraping,
+ * rendering a safe mailto link using DOM methods.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.textContent = email;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
