@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * NavBar Custom Element
+ * Purpose: Provides a responsive navigation bar with links and a theme toggle.
+ * Accessibility: Includes a skip-to-main-content link, aria-labels for buttons, and aria-current for the active page.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -49,10 +54,7 @@ class NavBar extends HTMLElement {
     ];
 
     linksData.forEach((data) => {
-      const a = document.createElement("a");
-      a.href = data.href;
-      a.textContent = data.text;
-      navLinks.appendChild(a);
+      navLinks.appendChild(this._createNavLink(data.href, data.text));
     });
 
     const themeToggleBtn = document.createElement("button");
@@ -65,14 +67,10 @@ class NavBar extends HTMLElement {
     this.appendChild(nav);
 
     let page = "index.html";
-    try {
-      const path = new URL(window.location.href).pathname;
-      const parsedPage = path.split("/").pop();
-      if (parsedPage) {
-        page = parsedPage;
-      }
-    } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+    const path = window.location.pathname;
+    const parsedPage = path.split("/").pop();
+    if (parsedPage) {
+      page = parsedPage;
     }
 
     const links = this.querySelectorAll("a");
@@ -107,10 +105,22 @@ class NavBar extends HTMLElement {
       }
     }
   }
+
+  _createNavLink(href, text) {
+    const a = document.createElement("a");
+    a.href = href;
+    a.textContent = text;
+    return a;
+  }
 }
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox Custom Element
+ * Purpose: Displays images in a fullscreen modal overlay.
+ * Accessibility: Uses role="dialog", aria-modal="true", manages focus, and supports Escape key to close.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -188,7 +198,11 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -198,6 +212,28 @@ document.addEventListener("click", (e) => {
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    e.preventDefault();
+    let lightbox = document.querySelector("image-lightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("image-lightbox");
+      document.body.appendChild(lightbox);
+    }
+    lightbox.open(e.target.src);
+  }
+});
+
+/**
+ * SiteFooter Custom Element
+ * Purpose: Displays the site footer with copyright info and social media links.
+ * Accessibility: Provides aria-labels for social links and opens them in a new tab securely.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -235,38 +271,55 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
     footer.appendChild(footerLinks);
     this.appendChild(footer);
   }
+
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail Custom Element
+ * Purpose: Decodes a base64 email address and displays it as a mailto link.
+ * Accessibility: Renders a standard anchor link for email clients.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
+
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.textContent = email;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
