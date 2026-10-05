@@ -1,6 +1,16 @@
 "use strict";
 
+/**
+ * Navigation Bar Component
+ * Manages the main navigation menu, active links, and theme toggling.
+ */
 class NavBar extends HTMLElement {
+  _createSvgPath(svgNS, d) {
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", d);
+    return path;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
@@ -22,17 +32,9 @@ class NavBar extends HTMLElement {
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("aria-hidden", "true");
 
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
+    svg.appendChild(this._createSvgPath(svgNS, "M3 10.5L12 3l9 7.5"));
+    svg.appendChild(this._createSvgPath(svgNS, "M5 9.5V21h14V9.5"));
+    svg.appendChild(this._createSvgPath(svgNS, "M10 21v-6h4v6"));
 
     homeLink.appendChild(svg);
     nav.appendChild(homeLink);
@@ -65,14 +67,10 @@ class NavBar extends HTMLElement {
     this.appendChild(nav);
 
     let page = "index.html";
-    try {
-      const path = new URL(window.location.href).pathname;
-      const parsedPage = path.split("/").pop();
-      if (parsedPage) {
-        page = parsedPage;
-      }
-    } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+    const path = window.location.pathname;
+    const parsedPage = path.split("/").pop();
+    if (parsedPage) {
+      page = parsedPage;
     }
 
     const links = this.querySelectorAll("a");
@@ -111,6 +109,10 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Image Lightbox Component
+ * Displays an image in a modal overlay with keyboard navigation support.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -188,7 +190,11 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -198,7 +204,48 @@ document.addEventListener("click", (e) => {
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    e.preventDefault();
+    let lightbox = document.querySelector("image-lightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("image-lightbox");
+      document.body.appendChild(lightbox);
+    }
+    lightbox.open(e.target.src);
+  }
+});
+
+/**
+ * Site Footer Component
+ * Displays copyright information and social links.
+ */
 class SiteFooter extends HTMLElement {
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.loading = "lazy";
+
+    a.appendChild(img);
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
@@ -235,22 +282,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
@@ -260,8 +292,13 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Secure Email Component
+ * Safely decodes a base64 encoded email address to prevent scraping.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
