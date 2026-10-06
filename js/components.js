@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ * Custom Element: `<nav-bar>`
+ *
+ * Renders the top navigation bar with a skip link, home icon, navigation links,
+ * and a theme toggle button. Manages active link state based on the current URL
+ * and handles light/dark theme toggling with localStorage persistence.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -16,25 +23,7 @@ class NavBar extends HTMLElement {
     homeLink.className = "nav-home";
     homeLink.setAttribute("aria-label", "Home");
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("class", "home-icon");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("aria-hidden", "true");
-
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
-
-    homeLink.appendChild(svg);
+    homeLink.appendChild(this._createHomeIcon());
     nav.appendChild(homeLink);
 
     const navLinks = document.createElement("div");
@@ -66,13 +55,13 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid URLs if any
     }
 
     const links = this.querySelectorAll("a");
@@ -107,10 +96,44 @@ class NavBar extends HTMLElement {
       }
     }
   }
+
+  /**
+   * Helper function to create the home SVG icon element.
+   * @private
+   * @returns {SVGElement} The constructed SVG icon element.
+   */
+  _createHomeIcon() {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path1 = document.createElementNS(svgNS, "path");
+    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS(svgNS, "path");
+    path2.setAttribute("d", "M5 9.5V21h14V9.5");
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS(svgNS, "path");
+    path3.setAttribute("d", "M10 21v-6h4v6");
+    svg.appendChild(path3);
+
+    return svg;
+  }
 }
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Custom Element: `<image-lightbox>`
+ *
+ * Renders an accessible modal overlay to display enlarged images. It handles
+ * click outside to close, Escape key listener to close, and manages focus
+ * restoration and ARIA attributes (e.g. `aria-modal`, `role="dialog"`).
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -186,18 +209,48 @@ class ImageLightbox extends HTMLElement {
 }
 customElements.define("image-lightbox", ImageLightbox);
 
-// Global listener for images with data-lightbox attribute
+/**
+ * Helper to open the global image lightbox
+ * @param {string} src The source URL of the image
+ */
+function openGlobalLightbox(src) {
+  let lightbox = document.querySelector("image-lightbox");
+  if (!lightbox) {
+    lightbox = document.createElement("image-lightbox");
+    document.body.appendChild(lightbox);
+  }
+  lightbox.open(src);
+}
+
+// Global listener for images with data-lightbox attribute (Click)
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
-    }
-    lightbox.open(e.target.src);
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    openGlobalLightbox(e.target.src);
   }
 });
 
+// Global listener for images with data-lightbox attribute (Keyboard - Enter/Space)
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    e.preventDefault(); // Prevent default page scroll for spacebar
+    openGlobalLightbox(e.target.src);
+  }
+});
+
+/**
+ * Custom Element: `<site-footer>`
+ *
+ * Renders the site footer containing copyright information and social links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -235,38 +288,61 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
     footer.appendChild(footerLinks);
     this.appendChild(footer);
   }
+
+  /**
+   * Helper function to construct a single social link element.
+   * @private
+   * @param {Object} link The social link data object (href, label, img).
+   * @returns {HTMLAnchorElement} The constructed anchor element wrapping the icon.
+   */
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Custom Element: `<secure-email>`
+ *
+ * Decodes a base64 email string provided in `data-email` and renders a secure
+ * mailto link to prevent basic bot scraping.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
+    if (this.hasChildNodes()) this.replaceChildren();
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${email}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }

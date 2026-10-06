@@ -103,10 +103,22 @@ nav a:hover {
 
 /* PAGE */
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .page {
   max-width: 1000px;
   margin: auto;
   padding: 0 20px 60px;
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 /* index.html hero needs space since the padding-top is now on body */

@@ -131,4 +131,67 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> and decodes base64 correctly", () => {
+    const secureEmail = document.createElement("secure-email");
+    // bWRiYWRydWRkdXphYWxpZkBnbWFpbC5jb20= is mdbadrudduzaalif@gmail.com
+    secureEmail.setAttribute(
+      "data-email",
+      "bWRiYWRydWRkdXphYWxpZkBnbWFpbC5jb20=",
+    );
+    document.body.appendChild(secureEmail);
+
+    const a = secureEmail.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.href).toBe("mailto:mdbadrudduzaalif@gmail.com");
+    expect(a.textContent).toBe("mdbadrudduzaalif@gmail.com");
+  });
+
+  it("global data-lightbox listener opens lightbox on keyboard events (Enter/Space) and checks nodeType", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/dummy.jpg";
+    img.setAttribute("data-lightbox", "true");
+    document.body.appendChild(img);
+
+    // Initial check: lightbox shouldn't exist
+    expect(document.querySelector("image-lightbox")).toBeNull();
+
+    // Test Enter key
+    const enterEvent = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+    });
+    img.dispatchEvent(enterEvent);
+
+    const lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    // Close it
+    lightbox.close();
+    expect(lightboxDiv.style.display).toBe("none");
+
+    // Test Space key
+    const spaceEvent = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+    });
+    img.dispatchEvent(spaceEvent);
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    // Close it
+    lightbox.close();
+    expect(lightboxDiv.style.display).toBe("none");
+
+    // Test non-element node event dispatching
+    const textNode = document.createTextNode("dummy");
+    document.body.appendChild(textNode);
+    const enterEventText = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+    });
+    textNode.dispatchEvent(enterEventText); // Should not throw and not open lightbox
+    expect(lightboxDiv.style.display).toBe("none");
+  });
 });
