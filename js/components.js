@@ -1,6 +1,18 @@
 "use strict";
 
+/**
+ * NavBar Custom Element.
+ * Provides the main navigation for the site, including a skip link for accessibility
+ * and a theme toggle button.
+ */
 class NavBar extends HTMLElement {
+  _createLink(href, text) {
+    const a = document.createElement("a");
+    a.href = href;
+    a.textContent = text;
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
@@ -49,10 +61,7 @@ class NavBar extends HTMLElement {
     ];
 
     linksData.forEach((data) => {
-      const a = document.createElement("a");
-      a.href = data.href;
-      a.textContent = data.text;
-      navLinks.appendChild(a);
+      navLinks.appendChild(this._createLink(data.href, data.text));
     });
 
     const themeToggleBtn = document.createElement("button");
@@ -66,7 +75,7 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
@@ -111,6 +120,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox Custom Element.
+ * A modal dialog for viewing enlarged images. Features ARIA attributes for accessibility
+ * and keyboard support (Escape key to close, focus restoration).
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,8 +201,18 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+function handleLightboxEvent(e) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    if (e.type === "keydown" && e.key !== "Enter" && e.key !== " ") {
+      return;
+    }
+    if (e.type === "keydown") {
+      e.preventDefault(); // Prevent page scroll on Space
+    }
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,9 +220,35 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
-});
+}
 
+document.addEventListener("click", handleLightboxEvent);
+document.addEventListener("keydown", handleLightboxEvent);
+
+/**
+ * SiteFooter Custom Element.
+ * Renders the site footer containing copyright information and social links.
+ */
 class SiteFooter extends HTMLElement {
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+
+    a.appendChild(img);
+    return a;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const currentYear = new Date().getFullYear();
@@ -235,22 +285,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
-      footerLinks.appendChild(a);
+      footerLinks.appendChild(this._createSocialLink(link));
     });
 
     footer.appendChild(footerCopy);
@@ -260,6 +295,11 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail Custom Element.
+ * Decodes a base64 encoded email address provided in the `data-email` attribute
+ * and renders a safe `mailto:` link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
