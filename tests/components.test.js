@@ -131,4 +131,21 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("global listener handles keydown events to open lightbox", () => {
+    // Add a dummy img with data-lightbox
+    const img = document.createElement("img");
+    img.setAttribute("data-lightbox", "true");
+    img.src = "http://localhost/test-global.jpg";
+    document.body.appendChild(img);
+
+    // Simulate Enter key on the image
+    const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+    img.dispatchEvent(event);
+
+    const lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+  });
 });
