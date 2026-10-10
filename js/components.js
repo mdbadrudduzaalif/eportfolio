@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Navigation Bar Web Component.
+ * Renders the top navigation menu, skip link, and theme toggler.
+ * Handles active link state based on current URL.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -111,6 +116,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Image Lightbox Web Component.
+ * Displays an enlarged view of an image in a modal overlay.
+ * Supports keyboard navigation (Escape key) and focus management for accessibility.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,17 +197,34 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
+function handleLightboxEvent(e) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    if (
+      e.type === "click" ||
+      (e.type === "keydown" && (e.key === "Enter" || e.key === " "))
+    ) {
+      e.preventDefault();
+      let lightbox = document.querySelector("image-lightbox");
+      if (!lightbox) {
+        lightbox = document.createElement("image-lightbox");
+        document.body.appendChild(lightbox);
+      }
+      lightbox.open(e.target.src);
     }
-    lightbox.open(e.target.src);
   }
-});
+}
 
+document.addEventListener("click", handleLightboxEvent);
+document.addEventListener("keydown", handleLightboxEvent);
+
+/**
+ * Site Footer Web Component.
+ * Renders the copyright information and social links at the bottom of the page.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -260,6 +287,11 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Secure Email Web Component.
+ * Decodes a base64 encoded email address from `data-email` attribute
+ * to prevent spam bots from easily scraping the email, and generates a mailto link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
