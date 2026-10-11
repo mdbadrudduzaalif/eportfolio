@@ -131,4 +131,47 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly and safely avoiding innerHTML", () => {
+    const secureEmail = document.createElement("secure-email");
+    // bWVAZXhhbXBsZS5jb20= is me@example.com base64 encoded
+    secureEmail.setAttribute("data-email", "bWVAZXhhbXBsZS5jb20=");
+    document.body.appendChild(secureEmail);
+
+    const a = secureEmail.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.href).toBe("mailto:me@example.com");
+    expect(a.textContent).toBe("me@example.com");
+    expect(a.style.color).not.toBeNull();
+  });
+
+  it("triggers lightbox on keyboard events (Enter/Space) and click on data-lightbox images", () => {
+    // Setup a dummy image
+    const img = document.createElement("img");
+    img.src = "http://localhost/test-img.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Test click
+    img.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    let lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    let lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+
+    // Test Enter key
+    img.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+    );
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+
+    // Test Space key
+    img.dispatchEvent(
+      new KeyboardEvent("keydown", { key: " ", bubbles: true }),
+    );
+    expect(lightboxDiv.style.display).toBe("flex");
+    lightbox.close();
+  });
 });
