@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * NavBar Web Component
+ * Provides the main navigation for the site, including a skip link for accessibility
+ * and a theme toggle button.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -22,17 +27,15 @@ class NavBar extends HTMLElement {
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("aria-hidden", "true");
 
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
+    const createPath = (d) => {
+      const path = document.createElementNS(svgNS, "path");
+      path.setAttribute("d", d);
+      return path;
+    };
 
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
+    svg.appendChild(createPath("M3 10.5L12 3l9 7.5"));
+    svg.appendChild(createPath("M5 9.5V21h14V9.5"));
+    svg.appendChild(createPath("M10 21v-6h4v6"));
 
     homeLink.appendChild(svg);
     nav.appendChild(homeLink);
@@ -111,6 +114,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox Web Component
+ * Displays an image in a full-screen modal overlay. Supports closing via
+ * click outside, close button, or Escape key. Trap/restore focus is managed for accessibility.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -188,7 +196,12 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -198,6 +211,28 @@ document.addEventListener("click", (e) => {
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    e.preventDefault();
+    let lightbox = document.querySelector("image-lightbox");
+    if (!lightbox) {
+      lightbox = document.createElement("image-lightbox");
+      document.body.appendChild(lightbox);
+    }
+    lightbox.open(e.target.src);
+  }
+});
+
+/**
+ * SiteFooter Web Component
+ * Displays the copyright year and social media links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -248,6 +283,7 @@ class SiteFooter extends HTMLElement {
       img.src = link.img;
       img.className = "footer-icon";
       img.alt = link.label;
+      img.setAttribute("loading", "lazy");
 
       a.appendChild(img);
       footerLinks.appendChild(a);
@@ -260,6 +296,11 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail Web Component
+ * Safely decodes a base64 encoded email string to prevent simple scraping.
+ * Requires `data-email` attribute.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
