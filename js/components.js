@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * NavBar custom element.
+ * Provides the main navigation menu for the website, including a theme toggle button.
+ * Implements a 'Skip to main content' link for accessibility.
+ * Automatically highlights the active link based on the current URL.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -88,22 +94,38 @@ class NavBar extends HTMLElement {
     });
 
     const themeToggleBtnRef = this.querySelector(".theme-toggle");
+
+    const updateMetaThemeColor = (isLight) => {
+      let metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (!metaTheme) {
+        metaTheme = document.createElement("meta");
+        metaTheme.name = "theme-color";
+        document.head.appendChild(metaTheme);
+      }
+      metaTheme.content = isLight ? "#f8fafc" : "#0f172a";
+    };
+
     if (themeToggleBtnRef) {
       themeToggleBtnRef.addEventListener("click", () => {
         document.body.classList.toggle("theme-light");
-        if (document.body.classList.contains("theme-light")) {
+        const isLight = document.body.classList.contains("theme-light");
+        if (isLight) {
           localStorage.setItem("theme", "light");
           themeToggleBtnRef.textContent = "🌙";
         } else {
           localStorage.removeItem("theme");
           themeToggleBtnRef.textContent = "☀️";
         }
+        updateMetaThemeColor(isLight);
       });
 
       const savedTheme = localStorage.getItem("theme");
       if (savedTheme === "light") {
         document.body.classList.add("theme-light");
         themeToggleBtnRef.textContent = "🌙";
+        updateMetaThemeColor(true);
+      } else {
+        updateMetaThemeColor(false);
       }
     }
   }
@@ -111,6 +133,12 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * ImageLightbox custom element.
+ * Provides a modal dialog for viewing enlarged images.
+ * Implements accessible modal features including role="dialog", aria-modal="true",
+ * aria-label, and aria-hidden. Also supports keyboard navigation (Escape to close).
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,8 +215,12 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+const handleLightboxTrigger = (e) => {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,8 +228,28 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
+};
+
+document.addEventListener("click", handleLightboxTrigger);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    if (
+      e.target.nodeType === 1 &&
+      typeof e.target.matches === "function" &&
+      e.target.matches("img[data-lightbox]")
+    ) {
+      e.preventDefault();
+      handleLightboxTrigger(e);
+    }
+  }
 });
 
+/**
+ * SiteFooter custom element.
+ * Renders the site's footer including copyright information and social links.
+ * All interactive elements within the footer provide proper aria-labels and are focusable.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -260,6 +312,12 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * SecureEmail custom element.
+ * Protects email addresses from simple scraping bots by expecting a base64 encoded string
+ * in the data-email attribute and decoding it dynamically on the client side using atob().
+ * Generates an accessible mailto link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
