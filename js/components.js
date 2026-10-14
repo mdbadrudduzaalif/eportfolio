@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Custom element for the navigation bar.
+ * Provides accessible navigation links, a skip-to-main-content link,
+ * and a light/dark theme toggle. Active link is determined based on the current URL.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -111,6 +116,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Custom element for an image lightbox modal.
+ * Provides accessible image viewing with proper ARIA attributes,
+ * keyboard navigation (Escape key), and focus management.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -122,7 +132,6 @@ class ImageLightbox extends HTMLElement {
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", "Image Lightbox");
-    lightbox.setAttribute("aria-hidden", "true");
 
     const closeBtn = document.createElement("button");
     closeBtn.className = "lightbox-close";
@@ -186,9 +195,13 @@ class ImageLightbox extends HTMLElement {
 }
 customElements.define("image-lightbox", ImageLightbox);
 
-// Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+function handleLightboxOpen(e) {
+  if (
+    e.target &&
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -196,8 +209,31 @@ document.addEventListener("click", (e) => {
     }
     lightbox.open(e.target.src);
   }
+}
+
+// Global listener for images with data-lightbox attribute
+document.addEventListener("click", handleLightboxOpen);
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    // Prevent default scrolling behavior for Spacebar
+    if (
+      e.key === " " &&
+      e.target &&
+      e.target.nodeType === 1 &&
+      typeof e.target.matches === "function" &&
+      e.target.matches("img[data-lightbox]")
+    ) {
+      e.preventDefault();
+    }
+    handleLightboxOpen(e);
+  }
 });
 
+/**
+ * Custom element for the site footer.
+ * Displays copyright information and social links with accessible icons.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -235,21 +271,7 @@ class SiteFooter extends HTMLElement {
     ];
 
     socialLinks.forEach((link) => {
-      const a = document.createElement("a");
-      a.className =
-        "footer-link" + (link.label === "GitHub" ? " github-link" : "");
-      a.href = link.href;
-      a.setAttribute("aria-label", link.label);
-      a.title = link.label;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-
-      const img = document.createElement("img");
-      img.src = link.img;
-      img.className = "footer-icon";
-      img.alt = link.label;
-
-      a.appendChild(img);
+      const a = this._createSocialLink(link);
       footerLinks.appendChild(a);
     });
 
@@ -257,9 +279,33 @@ class SiteFooter extends HTMLElement {
     footer.appendChild(footerLinks);
     this.appendChild(footer);
   }
+
+  _createSocialLink(link) {
+    const a = document.createElement("a");
+    a.className =
+      "footer-link" + (link.label === "GitHub" ? " github-link" : "");
+    a.href = link.href;
+    a.setAttribute("aria-label", link.label);
+    a.title = link.label;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+
+    const img = document.createElement("img");
+    img.src = link.img;
+    img.className = "footer-icon";
+    img.alt = link.label;
+    img.setAttribute("loading", "lazy");
+
+    a.appendChild(img);
+    return a;
+  }
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Custom element to display a base64 encoded email address safely.
+ * Decodes the email and renders a mailto link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
