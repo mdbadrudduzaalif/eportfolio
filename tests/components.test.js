@@ -131,4 +131,77 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly and decodes email", () => {
+    const secureEmail = document.createElement("secure-email");
+    secureEmail.setAttribute("data-email", btoa("test@example.com"));
+    document.body.appendChild(secureEmail);
+
+    const link = secureEmail.querySelector("a");
+    expect(link).not.toBeNull();
+    expect(link.href).toBe("mailto:test@example.com");
+    expect(link.textContent).toBe("test@example.com");
+  });
+
+  it("triggers lightbox on global click for img[data-lightbox]", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/click-test.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    img.click();
+
+    const lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    const lightboxImg = lightbox.querySelector(".lightbox-img");
+    expect(lightboxImg.src).toBe("http://localhost/click-test.jpg");
+  });
+
+  it("triggers lightbox on global keydown (Enter) for img[data-lightbox]", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/keydown-enter-test.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Simulate Enter key on the image
+    const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true });
+    Object.defineProperty(event, 'target', { value: img, enumerable: true });
+    img.dispatchEvent(event);
+
+    const lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    const lightboxImg = lightbox.querySelector(".lightbox-img");
+    expect(lightboxImg.src).toBe("http://localhost/keydown-enter-test.jpg");
+  });
+
+  it("triggers lightbox on global keydown (Space) for img[data-lightbox]", () => {
+    // Clear dom since previous tests created a lightbox
+    document.body.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = "http://localhost/keydown-space-test.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Simulate Space key on the image
+    const event = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+    Object.defineProperty(event, 'target', { value: img, enumerable: true });
+    img.dispatchEvent(event);
+
+    const lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    const lightboxImg = lightbox.querySelector(".lightbox-img");
+    expect(lightboxImg.src).toBe("http://localhost/keydown-space-test.jpg");
+  });
 });
