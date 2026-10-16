@@ -131,4 +131,56 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("opens lightbox on Enter or Space keydown for elements with data-lightbox", () => {
+    const img = document.createElement("img");
+    img.src = "http://localhost/test-image.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Initial state
+    let lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).toBeNull();
+
+    // Trigger Enter keydown on the image
+    const enterEvent = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+    });
+    img.dispatchEvent(enterEvent);
+
+    lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+    const lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    // Close it to test Space key
+    lightbox.close();
+    expect(lightboxDiv.style.display).toBe("none");
+
+    // Trigger Space keydown on the image
+    const spaceEvent = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+    });
+    img.dispatchEvent(spaceEvent);
+
+    expect(lightboxDiv.style.display).toBe("flex");
+  });
+
+  it("renders <secure-email> and decodes base64 email safely", () => {
+    const secureEmail = document.createElement("secure-email");
+    const testEmail = "test@example.com";
+    const encodedEmail = btoa(testEmail);
+    secureEmail.setAttribute("data-email", encodedEmail);
+    document.body.appendChild(secureEmail);
+
+    const aTag = secureEmail.querySelector("a");
+    expect(aTag).not.toBeNull();
+    expect(aTag.href).toBe(`mailto:${testEmail}`);
+    expect(aTag.textContent).toBe(testEmail);
+    // Note: Testing inline CSS custom properties with JSDOM fails due to lacking support
+    // So we'll skip checking the color style, but check the textDecoration
+    expect(aTag.style.textDecoration).toBe("none");
+  });
 });
