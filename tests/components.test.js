@@ -131,4 +131,56 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("renders <secure-email> correctly and creates mailto link safely", () => {
+    const emailComp = document.createElement("secure-email");
+    // "test@example.com" base64 encoded
+    emailComp.setAttribute("data-email", "dGVzdEBleGFtcGxlLmNvbQ==");
+    document.body.appendChild(emailComp);
+
+    const link = emailComp.querySelector("a");
+    expect(link).not.toBeNull();
+    expect(link.getAttribute("href")).toBe("mailto:test@example.com");
+    expect(link.textContent).toBe("test@example.com");
+    // JSDOM does not support CSS variables properly in inline styles,
+    // so it may drop them or be empty. We can skip checking it or just check it doesn't throw.
+  });
+
+  it("opens lightbox globally on keydown Enter on data-lightbox image", () => {
+    const img = document.createElement("img");
+    img.setAttribute("data-lightbox", "");
+    img.src = "http://localhost/test-global.jpg";
+    document.body.appendChild(img);
+
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    img.dispatchEvent(event);
+
+    const lightboxComp = document.querySelector("image-lightbox");
+    expect(lightboxComp).not.toBeNull();
+    const lightboxDiv = lightboxComp.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+  });
+
+  it("opens lightbox globally on keydown Space on data-lightbox image", () => {
+    const img = document.createElement("img");
+    img.setAttribute("data-lightbox", "");
+    img.src = "http://localhost/test-global.jpg";
+    document.body.appendChild(img);
+
+    const event = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+      cancelable: true,
+    });
+    img.dispatchEvent(event);
+
+    const lightboxComp = document.querySelector("image-lightbox");
+    expect(lightboxComp).not.toBeNull();
+    const lightboxDiv = lightboxComp.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+  });
 });
