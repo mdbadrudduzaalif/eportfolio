@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Navigation Bar Custom Element
+ * Handles rendering the top navigation bar, active link highlighting,
+ * and dark/light theme toggling.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -16,25 +21,7 @@ class NavBar extends HTMLElement {
     homeLink.className = "nav-home";
     homeLink.setAttribute("aria-label", "Home");
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("class", "home-icon");
-    svg.setAttribute("viewBox", "0 0 24 24");
-    svg.setAttribute("aria-hidden", "true");
-
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
-
-    homeLink.appendChild(svg);
+    homeLink.appendChild(this._createHomeIconSVG());
     nav.appendChild(homeLink);
 
     const navLinks = document.createElement("div");
@@ -66,16 +53,16 @@ class NavBar extends HTMLElement {
 
     let page = "index.html";
     try {
-      const path = new URL(window.location.href).pathname;
+      const path = window.location.pathname;
       const parsedPage = path.split("/").pop();
       if (parsedPage) {
         page = parsedPage;
       }
     } catch (e) {
-      // Fallback for invalid URLs if any, though location.href is typically valid
+      // Fallback for invalid paths if any
     }
 
-    const links = this.querySelectorAll("a");
+    const links = nav.querySelectorAll("a");
     links.forEach((link) => {
       const href = link.getAttribute("href");
       if (href === page) {
@@ -107,10 +94,36 @@ class NavBar extends HTMLElement {
       }
     }
   }
+
+  _createHomeIconSVG() {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "home-icon");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+
+    const path1 = document.createElementNS(svgNS, "path");
+    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS(svgNS, "path");
+    path2.setAttribute("d", "M5 9.5V21h14V9.5");
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS(svgNS, "path");
+    path3.setAttribute("d", "M10 21v-6h4v6");
+    svg.appendChild(path3);
+
+    return svg;
+  }
 }
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Image Lightbox Custom Element
+ * Handles rendering an accessible lightbox for displaying enlarged images.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -187,17 +200,32 @@ class ImageLightbox extends HTMLElement {
 customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
-document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
+const handleLightboxTrigger = (e) => {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    // Only handle clicks, or Enter/Space keys
+    if (e.type === "click" || (e.type === "keydown" && (e.key === "Enter" || e.key === " "))) {
+      e.preventDefault(); // Prevent page scroll for spacebar
+      let lightbox = document.querySelector("image-lightbox");
+      if (!lightbox) {
+        lightbox = document.createElement("image-lightbox");
+        document.body.appendChild(lightbox);
+      }
+      lightbox.open(e.target.src);
     }
-    lightbox.open(e.target.src);
   }
-});
+};
 
+document.addEventListener("click", handleLightboxTrigger);
+document.addEventListener("keydown", handleLightboxTrigger);
+
+/**
+ * Site Footer Custom Element
+ * Renders the page footer containing copyright info and social media links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -260,13 +288,22 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Secure Email Custom Element
+ * Safely decodes a base64 encoded email address and renders a mailto link.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const link = document.createElement("a");
+        link.href = `mailto:${email}`;
+        link.style.color = "var(--accent)";
+        link.style.textDecoration = "none";
+        link.textContent = email;
+        this.appendChild(link);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
