@@ -1,5 +1,10 @@
 "use strict";
 
+/**
+ * Custom Element: <nav-bar>
+ * Represents the main navigation bar of the site.
+ * Includes skip-to-content links for accessibility and a light/dark theme toggle.
+ */
 class NavBar extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -111,6 +116,11 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Custom Element: <image-lightbox>
+ * Provides a modal dialog for viewing enlarged images.
+ * Implements accessible ARIA roles and handles keyboard navigation (Escape to close).
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -188,7 +198,11 @@ customElements.define("image-lightbox", ImageLightbox);
 
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
     let lightbox = document.querySelector("image-lightbox");
     if (!lightbox) {
       lightbox = document.createElement("image-lightbox");
@@ -198,6 +212,28 @@ document.addEventListener("click", (e) => {
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    if (
+      e.target.nodeType === 1 &&
+      typeof e.target.matches === "function" &&
+      e.target.matches("img[data-lightbox]")
+    ) {
+      e.preventDefault(); // Prevent page scroll on space
+      let lightbox = document.querySelector("image-lightbox");
+      if (!lightbox) {
+        lightbox = document.createElement("image-lightbox");
+        document.body.appendChild(lightbox);
+      }
+      lightbox.open(e.target.src);
+    }
+  }
+});
+
+/**
+ * Custom Element: <site-footer>
+ * Represents the site footer containing copyright info and social media links.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -248,6 +284,7 @@ class SiteFooter extends HTMLElement {
       img.src = link.img;
       img.className = "footer-icon";
       img.alt = link.label;
+      img.loading = "lazy";
 
       a.appendChild(img);
       footerLinks.appendChild(a);
@@ -260,6 +297,11 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Custom Element: <secure-email>
+ * Obfuscates the email address in HTML attributes using base64 encoding
+ * and decodes it via JavaScript to prevent spam bots from easily harvesting it.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
