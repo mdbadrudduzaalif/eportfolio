@@ -131,4 +131,61 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  describe("Global Lightbox Listeners", () => {
+    let img;
+    let originalMatches;
+
+    beforeEach(() => {
+      img = document.createElement("img");
+      img.src = "test.jpg";
+      img.setAttribute("data-lightbox", "");
+      document.body.appendChild(img);
+      // Ensure element matches works as expected in JSDOM
+      originalMatches = Element.prototype.matches;
+      Element.prototype.matches = function (selector) {
+        if (
+          selector === "img[data-lightbox]" &&
+          this.hasAttribute("data-lightbox")
+        ) {
+          return true;
+        }
+        return originalMatches.call(this, selector);
+      };
+    });
+
+    afterEach(() => {
+      Element.prototype.matches = originalMatches;
+    });
+
+    it("opens lightbox on click of img[data-lightbox]", () => {
+      img.click();
+      const lightbox = document.querySelector("image-lightbox");
+      expect(lightbox).not.toBeNull();
+      const lightboxDiv = lightbox.querySelector(".lightbox");
+      expect(lightboxDiv.style.display).toBe("flex");
+      expect(lightbox.querySelector("img").src).toContain("test.jpg");
+    });
+
+    it("opens lightbox on Enter keydown of img[data-lightbox]", () => {
+      const event = new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+      });
+      img.dispatchEvent(event);
+      const lightbox = document.querySelector("image-lightbox");
+      expect(lightbox).not.toBeNull();
+      const lightboxDiv = lightbox.querySelector(".lightbox");
+      expect(lightboxDiv.style.display).toBe("flex");
+    });
+
+    it("opens lightbox on Space keydown of img[data-lightbox]", () => {
+      const event = new KeyboardEvent("keydown", { key: " ", bubbles: true });
+      img.dispatchEvent(event);
+      const lightbox = document.querySelector("image-lightbox");
+      expect(lightbox).not.toBeNull();
+      const lightboxDiv = lightbox.querySelector(".lightbox");
+      expect(lightboxDiv.style.display).toBe("flex");
+    });
+  });
 });
