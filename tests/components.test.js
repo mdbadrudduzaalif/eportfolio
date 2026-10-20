@@ -6,6 +6,8 @@ describe("Web Components", () => {
   });
 
   it("renders <nav-bar> correctly and sets active link", () => {
+    delete window.location;
+    window.location = { pathname: "/projects.html" };
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
 
@@ -21,7 +23,7 @@ describe("Web Components", () => {
 
   it("nav-bar sets no active link when path does not match any href", () => {
     delete window.location;
-    window.location = new URL("http://localhost/unknown.html");
+    window.location = { pathname: "/unknown.html" };
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -36,7 +38,7 @@ describe("Web Components", () => {
   it("nav-bar falls back to index.html when path is empty or root", () => {
     // Change jsdom url to root
     delete window.location;
-    window.location = new URL("http://localhost/");
+    window.location = { pathname: "/" };
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -50,7 +52,7 @@ describe("Web Components", () => {
   it("nav-bar correctly identifies active link when query parameters or hashes are present", () => {
     // Mock a URL with a query parameter and hash
     delete window.location;
-    window.location = new URL("http://localhost/projects.html?sort=desc#main");
+    window.location = { pathname: "/projects.html", href: "http://localhost/projects.html?sort=desc#main" };
 
     const nav = document.createElement("nav-bar");
     document.body.appendChild(nav);
@@ -130,5 +132,79 @@ describe("Web Components", () => {
     expect(() => {
       lightboxComp.close();
     }).not.toThrow();
+  });
+
+  it("renders <secure-email> correctly and prevents XSS", () => {
+    const secureEmail = document.createElement("secure-email");
+    // bWRiYWRydWRkdXphYWxpZkBnbWFpbC5jb20= is mdbadrudduzaalif@gmail.com
+    secureEmail.setAttribute(
+      "data-email",
+      "bWRiYWRydWRkdXphYWxpZkBnbWFpbC5jb20=",
+    );
+    document.body.appendChild(secureEmail);
+
+    const anchor = secureEmail.querySelector("a");
+    expect(anchor).not.toBeNull();
+    expect(anchor.getAttribute("href")).toBe(
+      "mailto:mdbadrudduzaalif@gmail.com",
+    );
+    expect(anchor.textContent).toBe("mdbadrudduzaalif@gmail.com");
+
+    // Ensure it does not use innerHTML by verifying child nodes
+    expect(secureEmail.childNodes.length).toBe(1);
+    expect(secureEmail.childNodes[0].nodeName).toBe("A");
+  });
+
+  it("global lightbox listener opens lightbox on click and keydown", () => {
+    const img = document.createElement("img");
+    img.setAttribute("data-lightbox", "");
+    img.src = "http://localhost/global-test.jpg";
+    document.body.appendChild(img);
+
+    // Simulate click
+    img.click();
+
+    let lightbox = document.querySelector("image-lightbox");
+    expect(lightbox).not.toBeNull();
+
+    let lightboxDiv = lightbox.querySelector(".lightbox");
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    let lightboxImg = lightbox.querySelector(".lightbox-img");
+    expect(lightboxImg.src).toBe("http://localhost/global-test.jpg");
+
+    // Close lightbox
+    lightbox.close();
+    expect(lightboxDiv.style.display).toBe("none");
+
+    // Simulate keydown (Enter)
+    const enterEvent = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+    });
+    img.dispatchEvent(enterEvent);
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    // Close lightbox
+    lightbox.close();
+
+    // Simulate keydown (Space)
+    const spaceEvent = new KeyboardEvent("keydown", {
+      key: " ",
+      bubbles: true,
+    });
+    img.dispatchEvent(spaceEvent);
+    expect(lightboxDiv.style.display).toBe("flex");
+
+    // Close lightbox
+    lightbox.close();
+
+    // Simulate other keydown (should not open)
+    const otherEvent = new KeyboardEvent("keydown", {
+      key: "a",
+      bubbles: true,
+    });
+    img.dispatchEvent(otherEvent);
+    expect(lightboxDiv.style.display).toBe("none");
   });
 });
