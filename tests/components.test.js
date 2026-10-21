@@ -131,4 +131,49 @@ describe("Web Components", () => {
       lightboxComp.close();
     }).not.toThrow();
   });
+
+  it("handles keydown event to open image-lightbox", () => {
+    // Setup the img element with data-lightbox
+    const img = document.createElement("img");
+    img.src = "http://localhost/test-trigger.jpg";
+    img.setAttribute("data-lightbox", "");
+    document.body.appendChild(img);
+
+    // Ensure lightbox is not present initially
+    let lightboxDiv = document.querySelector(".lightbox");
+    expect(lightboxDiv).toBeNull();
+
+    // Dispatch a keydown event (Enter)
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    });
+    img.dispatchEvent(event);
+
+    // Lightbox should now be created and opened
+    const lightboxComp = document.querySelector("image-lightbox");
+    expect(lightboxComp).not.toBeNull();
+
+    lightboxDiv = lightboxComp.querySelector(".lightbox");
+    expect(lightboxDiv).not.toBeNull();
+    expect(lightboxDiv.style.display).toBe("flex");
+    expect(lightboxDiv.getAttribute("aria-hidden")).toBe("false");
+
+    const lightboxImg = lightboxComp.querySelector(".lightbox-img");
+    expect(lightboxImg.src).toBe(img.src);
+  });
+
+  it("renders <secure-email> securely without innerHTML", () => {
+    const secureEmail = document.createElement("secure-email");
+    const testEmail = "test@example.com";
+    secureEmail.setAttribute("data-email", btoa(testEmail));
+    document.body.appendChild(secureEmail);
+
+    const a = secureEmail.querySelector("a");
+    expect(a).not.toBeNull();
+    expect(a.href).toBe(`mailto:${encodeURIComponent(testEmail)}`);
+    expect(a.textContent).toBe(testEmail);
+    expect(a.style.textDecoration).toBe("none");
+  });
 });
