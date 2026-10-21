@@ -1,6 +1,21 @@
 "use strict";
 
+/**
+ * Custom element representing the navigation bar.
+ * Includes skip links and handles active page logic and theme toggling.
+ */
 class NavBar extends HTMLElement {
+  /**
+   * Helper function to create an SVG path element.
+   * @param {string} d - The path string.
+   * @returns {SVGPathElement} The created SVG path element.
+   */
+  #createSVGPath(d) {
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", d);
+    return path;
+  }
+
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
     const nav = document.createElement("nav");
@@ -22,17 +37,9 @@ class NavBar extends HTMLElement {
     svg.setAttribute("viewBox", "0 0 24 24");
     svg.setAttribute("aria-hidden", "true");
 
-    const path1 = document.createElementNS(svgNS, "path");
-    path1.setAttribute("d", "M3 10.5L12 3l9 7.5");
-    svg.appendChild(path1);
-
-    const path2 = document.createElementNS(svgNS, "path");
-    path2.setAttribute("d", "M5 9.5V21h14V9.5");
-    svg.appendChild(path2);
-
-    const path3 = document.createElementNS(svgNS, "path");
-    path3.setAttribute("d", "M10 21v-6h4v6");
-    svg.appendChild(path3);
+    svg.appendChild(this.#createSVGPath("M3 10.5L12 3l9 7.5"));
+    svg.appendChild(this.#createSVGPath("M5 9.5V21h14V9.5"));
+    svg.appendChild(this.#createSVGPath("M10 21v-6h4v6"));
 
     homeLink.appendChild(svg);
     nav.appendChild(homeLink);
@@ -111,6 +118,10 @@ class NavBar extends HTMLElement {
 
 customElements.define("nav-bar", NavBar);
 
+/**
+ * Custom element representing an image lightbox.
+ * Displays an image in an overlay when triggered.
+ */
 class ImageLightbox extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -186,18 +197,43 @@ class ImageLightbox extends HTMLElement {
 }
 customElements.define("image-lightbox", ImageLightbox);
 
+function handleLightboxTrigger(target) {
+  let lightbox = document.querySelector("image-lightbox");
+  if (!lightbox) {
+    lightbox = document.createElement("image-lightbox");
+    document.body.appendChild(lightbox);
+  }
+  lightbox.open(target.src);
+}
+
 // Global listener for images with data-lightbox attribute
 document.addEventListener("click", (e) => {
-  if (e.target.matches("img[data-lightbox]")) {
-    let lightbox = document.querySelector("image-lightbox");
-    if (!lightbox) {
-      lightbox = document.createElement("image-lightbox");
-      document.body.appendChild(lightbox);
-    }
-    lightbox.open(e.target.src);
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    handleLightboxTrigger(e.target);
   }
 });
 
+document.addEventListener("keydown", (e) => {
+  if (
+    e.target.nodeType === 1 &&
+    typeof e.target.matches === "function" &&
+    e.target.matches("img[data-lightbox]")
+  ) {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleLightboxTrigger(e.target);
+    }
+  }
+});
+
+/**
+ * Custom element representing the site footer.
+ * Includes social links and copyright info.
+ */
 class SiteFooter extends HTMLElement {
   connectedCallback() {
     if (this.hasChildNodes()) this.replaceChildren();
@@ -260,13 +296,22 @@ class SiteFooter extends HTMLElement {
 }
 customElements.define("site-footer", SiteFooter);
 
+/**
+ * Custom element representing a secure email link.
+ * Decodes base64 encoded email addresses safely without innerHTML.
+ */
 class SecureEmail extends HTMLElement {
   connectedCallback() {
     const encodedEmail = this.getAttribute("data-email");
     if (encodedEmail) {
       try {
         const email = atob(encodedEmail);
-        this.innerHTML = `<a href="mailto:${email}" style="color: var(--accent); text-decoration: none;">${email}</a>`;
+        const a = document.createElement("a");
+        a.href = `mailto:${encodeURIComponent(email)}`;
+        a.style.color = "var(--accent)";
+        a.style.textDecoration = "none";
+        a.textContent = email;
+        this.appendChild(a);
       } catch (e) {
         console.error("Failed to decode email", e);
       }
